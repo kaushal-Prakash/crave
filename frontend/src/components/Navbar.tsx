@@ -42,7 +42,7 @@ function Navbar() {
           Home
         </Link>
         <Link
-          href="/Login"
+          href="/login"
           onClick={() => setIsOpen(false)}
           className="text-gray-800 hover:text-appetizingRed transition"
         >
@@ -53,7 +53,7 @@ function Navbar() {
           onClick={() => setIsOpen(false)}
           className="text-gray-800 hover:text-appetizingRed transition"
         >
-          Community
+          signup
         </Link>
         <Link
           href="/about-us"
