@@ -1,0 +1,13 @@
+@use "../base/animations" as *;
+
+.hero-text-1{
+    animation: toRight 0.5s ease-in-out;
+}
+
+.hero-text-2{
+    animation: toLeft 0.5s ease-in-out;
+}
+
+.hero-btn{
+    animation: toUp 0.5s ease-in-out;
+}

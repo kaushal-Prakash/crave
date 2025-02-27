@@ -16,18 +16,18 @@ export default function Home() {
           video not supported!!
         </video>
         <h1
-          className="text-6xl font-bold text-warmOrange mb-4 bg-gradient-to-r bg-clip-text text-transparent from-orange-400 to-orange-700 tracking-wide"
+          className="text-6xl font-bold text-warmOrange mb-4 bg-gradient-to-r bg-clip-text text-transparent from-orange-400 to-orange-700 tracking-wide hero-text-1"
           style={{ textShadow: "1px 3px 10px black inset" }}
         >
           Discover & Share Delicious Recipes
         </h1>
-        <p className="text-xl text-gray-700 mb-8">
+        <p className="text-xl text-gray-700 mb-8 hero-text-2">
           Join the Crave community to explore, share, and savor the best recipes
           from around the world.
         </p>
         <div className="space-x-4">
           <Link
-            className="bg-appetizingRed text-elegantWhite px-8 py-3 rounded-full hover:bg-freshGreen text-white hover:bg-orange-600 hover:tracking-widest transform hover transition-all duration-300 shadow-lg hover:shadow-xl bg-orange-400 cursor-pointer font-semibold"
+            className="bg-appetizingRed text-elegantWhite px-8 py-3 rounded-full hover:bg-freshGreen text-white hover:bg-orange-600 hover:tracking-widest transform hover transition-all duration-300 shadow-lg hover:shadow-xl bg-orange-400 cursor-pointer font-semibold hero-btn"
             href="/home"
           >
             Add Your Recipe
