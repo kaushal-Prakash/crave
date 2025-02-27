@@ -1,21 +1,7 @@
 "use client";
-import Footer from "@/components/Footer";
-import { useState } from "react";
 import Link from "next/link";
 
 export default function Home() {
-  const [recipes, setRecipes] = useState([
-    { id: 1, title: "Spaghetti Carbonara", likes: 12 },
-    { id: 2, title: "Avocado Toast", likes: 8 },
-  ]);
-
-  const handleLike = (id) => {
-    setRecipes((prev) =>
-      prev.map((recipe) =>
-        recipe.id === id ? { ...recipe, likes: recipe.likes + 1 } : recipe
-      )
-    );
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-neutralBeige to-elegantWhite flex flex-col items-center justify-center">
@@ -30,7 +16,7 @@ export default function Home() {
           video not supported!!
         </video>
         <h1
-          className="text-6xl font-bold text-warmOrange mb-4 bg-gradient-to-r bg-clip-text text-transparent from-orange-400 to-orange-700"
+          className="text-6xl font-bold text-warmOrange mb-4 bg-gradient-to-r bg-clip-text text-transparent from-orange-400 to-orange-700 tracking-wide"
           style={{ textShadow: "1px 3px 10px black inset" }}
         >
           Discover & Share Delicious Recipes
@@ -41,7 +27,7 @@ export default function Home() {
         </p>
         <div className="space-x-4">
           <Link
-            className="bg-appetizingRed text-elegantWhite px-8 py-3 rounded-full hover:bg-freshGreen hover:text-white hover:bg-orange-400 transform hover transition-all duration-300 shadow-lg hover:shadow-xl bg-orange-300 cursor-pointer font-semibold"
+            className="bg-appetizingRed text-elegantWhite px-8 py-3 rounded-full hover:bg-freshGreen text-white hover:bg-orange-600 hover:tracking-widest transform hover transition-all duration-300 shadow-lg hover:shadow-xl bg-orange-400 cursor-pointer font-semibold"
             href="/home"
           >
             Add Your Recipe
@@ -50,12 +36,12 @@ export default function Home() {
       </main>
 
       <section className="w-full max-w-3xl mt-10 text-center min-h-screen flex justify-center flex-col items-center gap-5">
-        <h2 className="text-3xl font-bold text-appetizingRed mb-6">
+        <h2 className="text-3xl md:text-4xl bg-gradient-to-r bg-clip-text text-transparent from-orange-400 to-orange-700 font-bold text-appetizingRed mb-6">
           Website Features
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <div className="bg-blue-100 hover:bg-blue-200 transition duration-300 ease-in-out transform hover:scale-105 shadow-md rounded-lg p-6 hover:shadow-lg">
-            <h3 className="text-xl font-semibold text-warmOrange">
+            <h3 className="text-xl font-semibold text-warmOrange bg-gradient-to-r bg-clip-text text-transparent from-orange-600 to-yellow-700">
               ✔️ Genuine Recipes
             </h3>
             <p className="text-gray-700 mt-2">
@@ -63,7 +49,7 @@ export default function Home() {
             </p>
           </div>
           <div className="bg-blue-100 hover:bg-blue-200 transition duration-300 ease-in-out transform hover:scale-105 shadow-md rounded-lg p-6 hover:shadow-lg">
-            <h3 className="text-xl font-semibold text-warmOrange">
+            <h3 className="text-xl font-semibold text-warmOrange bg-gradient-to-r bg-clip-text text-transparent from-orange-600 to-yellow-700">
               ✔️ Friendly Community
             </h3>
             <p className="text-gray-700 mt-2">
@@ -71,7 +57,7 @@ export default function Home() {
             </p>
           </div>
           <div className="bg-blue-100 hover:bg-blue-200 transition duration-300 ease-in-out transform hover:scale-105 shadow-md rounded-lg p-6 hover:shadow-lg">
-            <h3 className="text-xl font-semibold text-warmOrange">
+            <h3 className="text-xl font-semibold text-warmOrange bg-gradient-to-r bg-clip-text text-transparent from-orange-600 to-yellow-700">
               ✔️ No Toxicity
             </h3>
             <p className="text-gray-700 mt-2">
@@ -79,7 +65,7 @@ export default function Home() {
             </p>
           </div>
           <div className="bg-blue-100 hover:bg-blue-200 transition duration-300 ease-in-out transform hover:scale-105 shadow-md rounded-lg p-6 hover:shadow-lg">
-            <h3 className="text-xl font-semibold text-warmOrange">
+            <h3 className="text-xl font-semibold text-warmOrange bg-gradient-to-r bg-clip-text text-transparent from-orange-600 to-yellow-700">
               ✔️ Easy Sharing
             </h3>
             <p className="text-gray-700 mt-2">
@@ -88,8 +74,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
-      <Footer />
     </div>
   );
 }
