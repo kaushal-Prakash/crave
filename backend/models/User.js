@@ -9,7 +9,7 @@ export const createUser = async (fullName, username, email, password) => {
     );
     return result.insertId;
   } catch (error) {
-    throw error;
+    console.log("Error in creating user : ",error);
   }
 };
 
