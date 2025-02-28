@@ -1,8 +1,11 @@
 import connectDB from "../services/db.js";
 
 const createTables = async () => {
+  let connection;
   try {
-    const connection = await connectDB();
+    connection = await connectDB();
+
+    await connection.execute("SET FOREIGN_KEY_CHECKS=0;"); // Disable foreign key checks temporarily
 
     await connection.execute(`
       CREATE TABLE IF NOT EXISTS users (
@@ -12,7 +15,7 @@ const createTables = async () => {
         email VARCHAR(100) NOT NULL UNIQUE,
         password VARCHAR(255) NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      );
+      ) ENGINE=InnoDB;
     `);
 
     await connection.execute(`
@@ -23,7 +26,7 @@ const createTables = async () => {
         user_id INT NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-      );
+      ) ENGINE=InnoDB;
     `);
 
     await connection.execute(`
@@ -35,12 +38,16 @@ const createTables = async () => {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
         FOREIGN KEY (recipe_id) REFERENCES recipes(id) ON DELETE CASCADE
-      );
+      ) ENGINE=InnoDB;
     `);
 
-    console.log("✅ Tables are set up!");
+    await connection.execute("SET FOREIGN_KEY_CHECKS=1;"); // Re-enable foreign key checks
+
+    console.log("✅ Tables are set up successfully!");
   } catch (error) {
     console.error("❌ Error setting up tables:", error);
+  } finally {
+    if (connection) await connection.end(); // Close connection
   }
 };
 

@@ -62,7 +62,7 @@ const userLogin = async (req, res) => {
       return res.status(404).json({ message: "username not registered!" });
     }
 
-    const token = jwt.sign({ userExists, username }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ userId: userExists.id, username }, process.env.JWT_SECRET, {
       expiresIn: "7d",
     });
 
@@ -94,19 +94,29 @@ const userLogout = async (req, res) => {
 
 const addRecipe = async (req, res) => {
   try {
-    const token = req.cookies?.token;
-
-    if (!token) {
-      return res.status(401).json({ message: "Unauthorized! No token found." });
-    }
-
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const userId = decoded.userId;
-
     const { title, description } = req.body;
     if (!title || !description) {
-      return res.status(400).json({ message: "Fill all credentials!" });
+      return res.status(400).json({ message: "Title and description are required!" });
     }
+
+    const token = req.cookies.token;
+    if (!token) {
+      return res.status(401).json({ message: "Unauthorized: No token provided" });
+    }
+
+    let userId;
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      userId = decoded.userId;
+    } catch (error) {
+      return res.status(401).json({ message: "Unauthorized: Invalid token" });
+    }
+
+    if (!userId) {
+      return res.status(400).json({ message: "User ID missing from token!" });
+    }
+
+    console.log("Adding recipe with:", { title, description, userId });
 
     const connection = await connectDB();
     const [result] = await connection.execute(
@@ -114,16 +124,13 @@ const addRecipe = async (req, res) => {
       [title, description, userId]
     );
 
-    res
-      .status(201)
-      .json({
-        message: "Recipe added successfully!",
-        recipeId: result.insertId,
-      });
+    res.status(201).json({ message: "Recipe added successfully!", recipeId: result.insertId });
+
   } catch (error) {
     console.error("Error in adding recipe! :", error);
-    res.status(500).json({ message: "Database error" });
+    res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
 
 export { userSignup, userLogin, addRecipe,userLogout };
