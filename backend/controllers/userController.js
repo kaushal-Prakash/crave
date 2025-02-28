@@ -57,6 +57,7 @@ const userLogin = async (req, res) => {
     }
 
     const userExists = await getUserByUsername(username);
+    console.log(userExists);
     if (!userExists) {
       return res.status(404).json({ message: "username not registered!" });
     }
@@ -70,10 +71,59 @@ const userLogin = async (req, res) => {
       secure: process.env.NODE_ENV === "production",
     });
 
-    return res.status(200).json({message : "Login successful"})
+    return res.status(200).json({ message: "Login successful" });
   } catch (error) {
     console.log("Error in user login : ", error);
   }
 };
 
-export { userSignup, userLogin };
+const userLogout = async (req, res) => {
+  try {
+    res.cookie("token", "", {
+      httpOnly: true,
+      expires: new Date(0),
+      secure: process.env.NODE_ENV === "production",
+    });
+
+    res.status(200).json({ message: "User logged out successfully!" });
+  } catch (error) {
+    console.error("Error in user logout: ", error);
+    res.status(500).json({ message: "Server error during logout" });
+  }
+};
+
+const addRecipe = async (req, res) => {
+  try {
+    const token = req.cookies?.token;
+
+    if (!token) {
+      return res.status(401).json({ message: "Unauthorized! No token found." });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const userId = decoded.userId;
+
+    const { title, description } = req.body;
+    if (!title || !description) {
+      return res.status(400).json({ message: "Fill all credentials!" });
+    }
+
+    const connection = await connectDB();
+    const [result] = await connection.execute(
+      "INSERT INTO recipes (title, description, user_id) VALUES (?, ?, ?)",
+      [title, description, userId]
+    );
+
+    res
+      .status(201)
+      .json({
+        message: "Recipe added successfully!",
+        recipeId: result.insertId,
+      });
+  } catch (error) {
+    console.error("Error in adding recipe! :", error);
+    res.status(500).json({ message: "Database error" });
+  }
+};
+
+export { userSignup, userLogin, addRecipe,userLogout };
