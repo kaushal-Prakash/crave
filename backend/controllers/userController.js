@@ -138,7 +138,7 @@ const addRecipe = async (req, res) => {
     );
 
     res
-      .status(201)
+      .status(200)
       .json({
         message: "Recipe added successfully!",
         recipeId: result.insertId,
