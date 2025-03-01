@@ -1,4 +1,6 @@
 "use client";
+import RecipeCard from "@/components/RecipeCard";
+import { recipe } from "@/types/types";
 import axios from "axios";
 import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
@@ -8,7 +10,7 @@ const ITEMS_PER_PAGE = 10;
 function HomePage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [recipes, setRecipes] = useState([]);
+  const [recipes, setRecipes] = useState<recipe[]>([]);
 
   useEffect(() => {
     const getRecipes = async () => {
@@ -21,6 +23,7 @@ function HomePage() {
 
         if (res.status === 200) {
           setRecipes(res.data.recipes);
+          console.log(res.data.recipes)
         } else {
           toast.error("Error fetching recipes");
         }
@@ -34,7 +37,7 @@ function HomePage() {
   }, []);
 
   const filteredRecipes = recipes.filter((recipe) =>
-    recipe.title.toLowerCase().includes(searchQuery.toLowerCase()) // Use `title` instead of `name`
+    recipe.title.toLowerCase().includes(searchQuery.toLowerCase()) 
   );
 
   const totalPages = Math.ceil(filteredRecipes.length / ITEMS_PER_PAGE);
@@ -63,19 +66,7 @@ function HomePage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 min-h-screen">
         {paginatedRecipes.length > 0 ? (
           paginatedRecipes.map((recipe) => (
-            <div
-              key={recipe.id}
-              className="bg-white p-4 rounded-lg shadow-md max-h-60"
-            >
-              {/* Replace with actual image URL if available */}
-            
-              <h3 className="text-lg font-semibold mt-3 text-gray-800">
-                {recipe.title} {/* Use `title` instead of `name` */}
-              </h3>
-              <p className="text-sm text-gray-600 mt-2">
-                {recipe.description} {/* Display recipe description */}
-              </p>
-            </div>
+            <RecipeCard key={recipe.id} {...recipe}/>
           ))
         ) : (
           <p className="col-span-full text-center text-gray-700">
