@@ -57,7 +57,6 @@ const userLogin = async (req, res) => {
     }
 
     const userExists = await getUserByUsername(username);
-    console.log(userExists);
     if (!userExists) {
       return res.status(404).json({ message: "username not registered!" });
     }
@@ -73,6 +72,7 @@ const userLogin = async (req, res) => {
     res.cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
+      path: "/",
     });
 
     return res.status(200).json({ message: "Login successful" });
@@ -87,6 +87,7 @@ const userLogout = async (req, res) => {
       httpOnly: true,
       expires: new Date(0),
       secure: process.env.NODE_ENV === "production",
+      path: "/",
     });
 
     res.status(200).json({ message: "User logged out successfully!" });

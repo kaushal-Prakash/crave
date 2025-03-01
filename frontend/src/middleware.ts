@@ -5,7 +5,6 @@ export function middleware(req: NextRequest) {
   const token = req.cookies.get("token")?.value;
 
   console.log("Middleware triggered for path:", req.nextUrl.pathname);
-  console.log("Token found:", token);
 
   if (publicRoutes.includes(req.nextUrl.pathname)) {
     console.log("Public route, allowing access");

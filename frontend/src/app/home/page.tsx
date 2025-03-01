@@ -1,29 +1,40 @@
 "use client";
+import axios from "axios";
 import React, { useState, useEffect } from "react";
-
-const recipes = [
-  { id: 1, name: "Spaghetti Carbonara", image: "/recipes/spaghetti.jpg" },
-  { id: 2, name: "Chicken Curry", image: "/recipes/chicken-curry.jpg" },
-  { id: 3, name: "Vegetable Stir Fry", image: "/recipes/stir-fry.jpg" },
-  { id: 4, name: "Grilled Salmon", image: "/recipes/salmon.jpg" },
-  { id: 5, name: "Pancakes", image: "/recipes/pancakes.jpg" },
-  { id: 6, name: "Chocolate Cake", image: "/recipes/chocolate-cake.jpg" },
-  { id: 7, name: "Caesar Salad", image: "/recipes/caesar-salad.jpg" },
-  { id: 8, name: "Mushroom Risotto", image: "/recipes/risotto.jpg" },
-  { id: 9, name: "Tacos", image: "/recipes/tacos.jpg" },
-  { id: 10, name: "Tacos", image: "/recipes/tacos.jpg" },
-  { id: 11, name: "Tacos", image: "/recipes/tacos.jpg" },
-  { id: 12, name: "Tacos", image: "/recipes/tacos.jpg" },
-];
+import { toast } from "react-toastify";
 
 const ITEMS_PER_PAGE = 10;
 
 function HomePage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [recipes, setRecipes] = useState([]);
+
+  useEffect(() => {
+    const getRecipes = async () => {
+      try {
+        const res = await axios.get(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}recipes/get-recipes`,{
+            withCredentials: true
+          }
+        );
+
+        if (res.status === 200) {
+          setRecipes(res.data.recipes);
+        } else {
+          toast.error("Error fetching recipes");
+        }
+      } catch (error) {
+        console.log(error);
+        toast.error("Failed to fetch recipes");
+      }
+    };
+
+    getRecipes();
+  }, []);
 
   const filteredRecipes = recipes.filter((recipe) =>
-    recipe.name.toLowerCase().includes(searchQuery.toLowerCase())
+    recipe.title.toLowerCase().includes(searchQuery.toLowerCase()) // Use `title` instead of `name`
   );
 
   const totalPages = Math.ceil(filteredRecipes.length / ITEMS_PER_PAGE);
@@ -56,14 +67,14 @@ function HomePage() {
               key={recipe.id}
               className="bg-white p-4 rounded-lg shadow-md max-h-60"
             >
-              <img
-                src={recipe.image}
-                alt={recipe.name}
-                className="w-full h-40 object-cover rounded-lg"
-              />
+              {/* Replace with actual image URL if available */}
+            
               <h3 className="text-lg font-semibold mt-3 text-gray-800">
-                {recipe.name}
+                {recipe.title} {/* Use `title` instead of `name` */}
               </h3>
+              <p className="text-sm text-gray-600 mt-2">
+                {recipe.description} {/* Display recipe description */}
+              </p>
             </div>
           ))
         ) : (
