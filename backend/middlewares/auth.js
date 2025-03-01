@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 
 const authMiddleware = (req, res, next) => {
-  const openRoutes = ["/users/user-login", "/users/user-signup","/"];
+  const openRoutes = ["/users/user-login", "/users/user-signup","/","/users/isLogedIn"];
   if (openRoutes.includes(req.path)) {
     return next();
   }

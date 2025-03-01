@@ -1,31 +1,39 @@
 "use client";
+import axios from "axios";
 import Link from "next/link";
 import React, { useState, useEffect } from "react";
 import { FiMenu, FiX } from "react-icons/fi";
-import { toast } from "react-toastify";
 
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false); // State to track login status
 
   useEffect(() => {
-    const token = document.cookie
-      .split("; ")
-      .find((row) => row.startsWith("token="))
-      ?.split("=")[1];
+    const checkAuthStatus = async () => {
+      try {
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}users/is-loged-in`,{withCredentials: true});
 
-    if (token) {
-      setIsLoggedIn(true);
-    }
+        if (response.status == 200) {
+          setIsLoggedIn(true);
+        } else {
+          setIsLoggedIn(false);
+        }
+      } catch (error) {
+        console.error("Error checking session:", error);
+        setIsLoggedIn(false);
+      }
+    };
+
+    checkAuthStatus();
   }, []);
+  
+  const handleLogout = async () => {
+    try {
+      const res = await axios(`${process.env.NEXT_PUBLIC_BACKEND_URL}users/user-logout`,{withCredentials : true});
 
-  // Logout function
-  const handleLogout = () => {
-    // Clear the token cookie
-    document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-    setIsLoggedIn(false); // Update login status
-    toast.success("Logged out successfully");
-    setIsOpen(false); // Close the mobile menu
+    } catch (error) {
+      console.log("Error during logout : ",error)
+    }
   };
 
   return (

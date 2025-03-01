@@ -40,6 +40,7 @@ const userSignup = async (req, res) => {
     res.cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
     res.status(201).json({ message: "User registered!", userId });
@@ -72,7 +73,7 @@ const userLogin = async (req, res) => {
     res.cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      path: "/",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
     return res.status(200).json({ message: "Login successful" });
@@ -80,6 +81,18 @@ const userLogin = async (req, res) => {
     console.log("Error in user login : ", error);
   }
 };
+
+const isLogedIn = async (req,res)=> {
+  try {
+    const userId = req.user;
+    if(!userId){
+      return res.status(404).json({message : "No token found"});
+    }
+    return res.status(200).json({message : "User is genuine"});
+  } catch (error) {
+    console.log("Error during validating login : ",error)
+  }
+}
 
 const userLogout = async (req, res) => {
   try {
@@ -136,4 +149,4 @@ const addRecipe = async (req, res) => {
   }
 };
 
-export { userSignup, userLogin, addRecipe, userLogout };
+export { userSignup, userLogin, addRecipe, userLogout ,isLogedIn};
