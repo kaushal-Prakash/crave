@@ -36,4 +36,25 @@ const getRecipeById = async (req, res) => {
   }
 };
 
-export { getRecipes, getRecipeById };
+const updateRecipe = async (req,res) => {
+    try {
+        const {id,title,description} = req.body;
+        if(!id || !title || !description){
+            return res.status(404).json({message : "Enter all details"});
+        }
+
+        const connection = await connectDB();
+        const [result] = await connection.execute("update recipes set title = ?, description = ? where id = ?",[title,description,id]);
+
+        const {warningStatus} = result;
+        if(warningStatus > 0){
+            return res.status(400).json({message : "Failed to update recipe!"});
+        }
+        return res.status(200).json({result});
+    } catch (error) {
+        console.log("Error in updating recipe : ",error);
+        return res.status(500).json({message : "Internal Server Error"})
+    }
+}
+
+export { getRecipes, getRecipeById ,updateRecipe};
