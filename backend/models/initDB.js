@@ -41,6 +41,18 @@ const createTables = async () => {
       ) ENGINE=InnoDB;
     `);
 
+    // Create favorites table (many-to-many relationship between users and recipes)
+    await connection.execute(`
+          CREATE TABLE IF NOT EXISTS favorites (
+            user_id INT NOT NULL,
+            recipe_id INT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (user_id, recipe_id), -- Composite primary key
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+            FOREIGN KEY (recipe_id) REFERENCES recipes(id) ON DELETE CASCADE
+          ) ENGINE=InnoDB;
+        `);
+
     await connection.execute("SET FOREIGN_KEY_CHECKS=1;"); // Re-enable foreign key checks
 
     console.log("✅ Tables are set up successfully!");
