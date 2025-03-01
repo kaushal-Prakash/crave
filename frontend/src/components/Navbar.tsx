@@ -3,6 +3,7 @@ import axios from "axios";
 import Link from "next/link";
 import React, { useState, useEffect } from "react";
 import { FiMenu, FiX } from "react-icons/fi";
+import { toast } from "react-toastify";
 
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -31,6 +32,10 @@ function Navbar() {
     try {
       const res = await axios(`${process.env.NEXT_PUBLIC_BACKEND_URL}users/user-logout`,{withCredentials : true});
 
+      if(res.status == 200){
+        toast.success(res.data.message);
+        window.location.href = "/login";
+      }
     } catch (error) {
       console.log("Error during logout : ",error)
     }
@@ -39,8 +44,8 @@ function Navbar() {
   return (
     <nav className="fixed top-0 left-0 w-full p-5 flex justify-between items-center shadow-md z-50 backdrop-blur-sm rounded-b-2xl">
       {/* Logo */}
-      <div className="text-2xl font-bold text-appetizingRed text-amber-950 tracking-widest">
-        Crave
+      <div className="text-2xl font-bold text-appetizingRed text-amber-950 tracking-widest cursor-pointer" onClick={ () => window.location.href = "/"}>
+        Crave.
       </div>
 
       <button
@@ -66,7 +71,7 @@ function Navbar() {
         <Link
           href="/home"
           onClick={() => setIsOpen(false)}
-          className="text-gray-800 hover:text-appetizingRed hover:scale-110 hover:underline transition-all duration-100"
+          className="text-gray-800 hover:text-appetizingRed hover:scale-110 hover:underline transition-all duration-100 cursor-pointer"
         >
           Home
         </Link>
@@ -77,20 +82,20 @@ function Navbar() {
             <Link
               href="/profile"
               onClick={() => setIsOpen(false)}
-              className="text-gray-800 hover:text-appetizingRed hover:scale-110 hover:underline transition-all duration-100"
+              className="text-gray-800 hover:text-appetizingRed hover:scale-110 hover:underline transition-all duration-100 cursor-pointer"
             >
               Profile
             </Link>
             <Link
               href="/my-recipes"
               onClick={() => setIsOpen(false)}
-              className="text-gray-800 hover:text-appetizingRed hover:scale-110 hover:underline transition-all duration-100"
+              className="text-gray-800 hover:text-appetizingRed hover:scale-110 hover:underline transition-all duration-100 cursor-pointer"
             >
               My Recipes
             </Link>
             <button
               onClick={handleLogout}
-              className="text-gray-800 hover:text-appetizingRed hover:scale-110 hover:underline transition-all duration-100"
+              className="text-gray-800 hover:text-appetizingRed hover:scale-110 hover:underline transition-all duration-100 cursor-pointer"
             >
               Logout
             </button>
@@ -100,14 +105,14 @@ function Navbar() {
             <Link
               href="/login"
               onClick={() => setIsOpen(false)}
-              className="text-gray-800 hover:text-appetizingRed hover:scale-110 hover:underline transition-all duration-100"
+              className="text-gray-800 hover:text-appetizingRed hover:scale-110 hover:underline transition-all duration-100 cursor-pointer"
             >
               Login
             </Link>
             <Link
               href="/signup"
               onClick={() => setIsOpen(false)}
-              className="text-gray-800 hover:text-appetizingRed hover:scale-110 hover:underline transition-all duration-100"
+              className="text-gray-800 hover:text-appetizingRed hover:scale-110 hover:underline transition-all duration-100 cursor-pointer"
             >
               Signup
             </Link>
@@ -117,7 +122,7 @@ function Navbar() {
         <Link
           href="/about-us"
           onClick={() => setIsOpen(false)}
-          className="text-gray-800 hover:text-appetizingRed hover:scale-110 hover:underline transition-all duration-100"
+          className="text-gray-800 hover:text-appetizingRed hover:scale-110 hover:underline transition-all duration-100 cursor-pointer"
         >
           About Us
         </Link>
