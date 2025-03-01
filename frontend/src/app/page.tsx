@@ -1,8 +1,11 @@
 "use client";
 import Link from "next/link";
+import { MdOutlineVerified } from "react-icons/md";
+import { GiThreeFriends } from "react-icons/gi";
+import { MdHealthAndSafety } from "react-icons/md";
+import { MdOutlineScreenShare } from "react-icons/md";
 
 export default function Home() {
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-neutralBeige to-elegantWhite flex flex-col items-center justify-center">
       <main className="flex flex-col items-center text-center px-4 min-h-screen justify-center relative w-full">
@@ -35,38 +38,42 @@ export default function Home() {
         </div>
       </main>
 
-      <section className="w-full max-w-3xl mt-10 text-center min-h-screen flex justify-center flex-col items-center gap-5">
+      <section className="w-full max-w-3xl mt-10 text-center min-h-screen flex justify-center flex-col items-center gap-5 px-5 md:px-0">
         <h2 className="text-3xl md:text-4xl bg-gradient-to-r bg-clip-text text-transparent from-orange-400 to-orange-700 font-bold text-appetizingRed mb-6">
           Website Features
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <div className="bg-blue-100 hover:bg-blue-200 transition duration-300 ease-in-out transform hover:scale-105 shadow-md rounded-lg p-6 hover:shadow-lg">
+          <div className="bg-blue-100 hover:bg-blue-200 transition duration-300 ease-in-out transform hover:scale-105 shadow-md rounded-lg p-6 hover:shadow-lg flex flex-col items-center">
+            <MdOutlineVerified className="text-4xl text-warmOrange mb-2" />
             <h3 className="text-xl font-semibold text-warmOrange bg-gradient-to-r bg-clip-text text-transparent from-orange-600 to-yellow-700">
-              ✔️ Genuine Recipes
+              Genuine Recipes
             </h3>
             <p className="text-gray-700 mt-2">
               Authentic and verified recipes from real cooks.
             </p>
           </div>
-          <div className="bg-blue-100 hover:bg-blue-200 transition duration-300 ease-in-out transform hover:scale-105 shadow-md rounded-lg p-6 hover:shadow-lg">
+          <div className="bg-blue-100 hover:bg-blue-200 transition duration-300 ease-in-out transform hover:scale-105 shadow-md rounded-lg p-6 hover:shadow-lg flex flex-col items-center">
+            <GiThreeFriends className="text-4xl text-warmOrange mb-2" />
             <h3 className="text-xl font-semibold text-warmOrange bg-gradient-to-r bg-clip-text text-transparent from-orange-600 to-yellow-700">
-              ✔️ Friendly Community
+              Friendly Community
             </h3>
             <p className="text-gray-700 mt-2">
               Join a positive and supportive environment.
             </p>
           </div>
-          <div className="bg-blue-100 hover:bg-blue-200 transition duration-300 ease-in-out transform hover:scale-105 shadow-md rounded-lg p-6 hover:shadow-lg">
+          <div className="bg-blue-100 hover:bg-blue-200 transition duration-300 ease-in-out transform hover:scale-105 shadow-md rounded-lg p-6 hover:shadow-lg flex flex-col items-center">
+            <MdHealthAndSafety className="text-4xl text-warmOrange mb-2" />
             <h3 className="text-xl font-semibold text-warmOrange bg-gradient-to-r bg-clip-text text-transparent from-orange-600 to-yellow-700">
-              ✔️ No Toxicity
+              No Toxicity
             </h3>
             <p className="text-gray-700 mt-2">
               Safe space with no negative interactions.
             </p>
           </div>
-          <div className="bg-blue-100 hover:bg-blue-200 transition duration-300 ease-in-out transform hover:scale-105 shadow-md rounded-lg p-6 hover:shadow-lg">
+          <div className="bg-blue-100 hover:bg-blue-200 transition duration-300 ease-in-out transform hover:scale-105 shadow-md rounded-lg p-6 hover:shadow-lg flex flex-col items-center">
+            <MdOutlineScreenShare className="text-4xl text-warmOrange mb-2" />
             <h3 className="text-xl font-semibold text-warmOrange bg-gradient-to-r bg-clip-text text-transparent from-orange-600 to-yellow-700">
-              ✔️ Easy Sharing
+              Easy Sharing
             </h3>
             <p className="text-gray-700 mt-2">
               Like and share your favorite recipes effortlessly.
