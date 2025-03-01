@@ -1,4 +1,3 @@
-import { response } from "express";
 import { getAllRecipes } from "../models/Recipe.js";
 import connectDB from "../services/db.js";
 
