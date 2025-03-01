@@ -6,6 +6,7 @@ import userRoutes from "./routes/userRoutes.js";
 import recipeRoutes from "./routes/recipeRoutes.js";
 import commentRoutes from "./routes/commentRoutes.js";
 import cookieParser from "cookie-parser";
+import authMiddleware from "./middlewares/auth.js";
 
 dotenv.config();
 
@@ -15,6 +16,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
+app.use(authMiddleware);
 
 app.use("/users", userRoutes);
 app.use("/recipes", recipeRoutes);

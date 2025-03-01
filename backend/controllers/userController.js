@@ -62,9 +62,13 @@ const userLogin = async (req, res) => {
       return res.status(404).json({ message: "username not registered!" });
     }
 
-    const token = jwt.sign({ userId: userExists.id, username }, process.env.JWT_SECRET, {
-      expiresIn: "7d",
-    });
+    const token = jwt.sign(
+      { userId: userExists.id, username },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "7d",
+      }
+    );
 
     res.cookie("token", token, {
       httpOnly: true,
@@ -96,27 +100,22 @@ const addRecipe = async (req, res) => {
   try {
     const { title, description } = req.body;
     if (!title || !description) {
-      return res.status(400).json({ message: "Title and description are required!" });
+      return res
+        .status(400)
+        .json({ message: "Title and description are required!" });
     }
 
     const token = req.cookies.token;
     if (!token) {
-      return res.status(401).json({ message: "Unauthorized: No token provided" });
+      return res
+        .status(401)
+        .json({ message: "Unauthorized: No token provided" });
     }
-
-    let userId;
-    try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      userId = decoded.userId;
-    } catch (error) {
-      return res.status(401).json({ message: "Unauthorized: Invalid token" });
-    }
+    const {userId} = req.user;
 
     if (!userId) {
       return res.status(400).json({ message: "User ID missing from token!" });
     }
-
-    console.log("Adding recipe with:", { title, description, userId });
 
     const connection = await connectDB();
     const [result] = await connection.execute(
@@ -124,13 +123,16 @@ const addRecipe = async (req, res) => {
       [title, description, userId]
     );
 
-    res.status(201).json({ message: "Recipe added successfully!", recipeId: result.insertId });
-
+    res
+      .status(201)
+      .json({
+        message: "Recipe added successfully!",
+        recipeId: result.insertId,
+      });
   } catch (error) {
     console.error("Error in adding recipe! :", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
-
-export { userSignup, userLogin, addRecipe,userLogout };
+export { userSignup, userLogin, addRecipe, userLogout };
