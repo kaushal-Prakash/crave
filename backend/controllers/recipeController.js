@@ -28,7 +28,7 @@ const getRecipeById = async (req, res) => {
         return res.status(404).json({message : "No recipe found"});
     }
     
-    return res.status(200).json({result});
+    return res.status(200).json(result);
   } catch (error) {
     console.log("Error in fetching recipe by id : ", error);
     return res.status(500).json({ message: "Internal server error" });
