@@ -8,7 +8,20 @@ import { HiOutlinePencilSquare } from "react-icons/hi2";
 import { toast } from "react-toastify";
 import axios from "axios";
 
-function RecipeCard({ title, description, created_at, id, user_id }: recipe) {
+interface RecipeCardProps extends recipe {
+  onDelete: () => void; 
+  onUpdate: () => void; 
+}
+
+function RecipeCard({
+  title,
+  description,
+  created_at,
+  id,
+  user_id,
+  onDelete,
+  onUpdate,
+}: RecipeCardProps) {
   const router = useRouter();
   const [isPinning, setIsPinning] = useState(false);
   const [currentUserId, setCurrentUserId] = useState<number | null>(null);
@@ -69,15 +82,21 @@ function RecipeCard({ title, description, created_at, id, user_id }: recipe) {
 
       if (res.status === 200) {
         toast.success(res.data.message);
+        onDelete(); 
       } else {
-        toast.error("Failed to add delete recipe");
+        toast.error("Failed to delete recipe");
       }
     } catch (error) {
-      console.log("Error adding favorites: ", error);
+      console.log("Error deleting recipe: ", error);
       toast.error("Internal server error! Please try again.");
     } finally {
       setIsPinning(false);
     }
+  };
+
+  const handleUpdate = () => {
+    onUpdate(); // Call the onUpdate prop to refresh the recipes
+    router.push(`/update-recipe/${id}`);
   };
 
   return (
@@ -97,7 +116,7 @@ function RecipeCard({ title, description, created_at, id, user_id }: recipe) {
         {currentUserId === user_id && (
           <button
             className="absolute right-12 top-3 cursor-pointer transition-all hover:shadow-2xl duration-200 hover:text-orange-600 hover:scale-110 backface-hidden"
-            onClick={() => (window.location.href = `/update-recipe/${id}`)}
+            onClick={handleUpdate} // Use handleUpdate instead of direct navigation
           >
             <HiOutlinePencilSquare size={25} />
           </button>
@@ -106,7 +125,7 @@ function RecipeCard({ title, description, created_at, id, user_id }: recipe) {
         {currentUserId === user_id && (
           <button
             className="absolute right-20 top-3 cursor-pointer transition-all hover:shadow-2xl duration-200 hover:text-orange-600 hover:scale-110 backface-hidden"
-            onClick={handleDelete}
+            onClick={handleDelete} // Use handleDelete for deletion
           >
             <MdDeleteForever size={25} />
           </button>

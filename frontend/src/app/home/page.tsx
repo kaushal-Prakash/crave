@@ -11,6 +11,7 @@ function HomePage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [recipes, setRecipes] = useState<recipe[]>([]);
+  const [refreshRecipes, setRefreshRecipes] = useState(false); 
 
   useEffect(() => {
     const getRecipes = async () => {
@@ -48,7 +49,7 @@ function HomePage() {
 
     getRecipes();
     fetchCurrentUser();
-  }, []);
+  }, [refreshRecipes]);
 
   const filteredRecipes = recipes.filter((recipe) =>
     recipe.title.toLowerCase().includes(searchQuery.toLowerCase())
@@ -65,6 +66,10 @@ function HomePage() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [currentPage]);
 
+  const handleRefreshRecipes = () => {
+    setRefreshRecipes((prev) => !prev);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-200 to-yellow-200 p-8">
       <div className="max-w-md mx-auto mb-6 pt-20">
@@ -80,7 +85,12 @@ function HomePage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 min-h-screen">
         {paginatedRecipes.length > 0 ? (
           paginatedRecipes.map((recipe) => (
-            <RecipeCard key={recipe.id} {...recipe} />
+            <RecipeCard
+              key={recipe.id}
+              {...recipe}
+              onDelete={handleRefreshRecipes}
+              onUpdate={handleRefreshRecipes}
+            />
           ))
         ) : (
           <p className="col-span-full text-center text-gray-700">
