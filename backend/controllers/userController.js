@@ -178,7 +178,6 @@ const addToFavorite = async (req, res) => {
   try {
     const { userId } = req.user;
     const { id: recipeId } = req.params;
-    console.log(req.params);
     const connection = await connectDB();
     const [recipe] = await connection.execute(
       "SELECT * FROM recipes WHERE id = ?",

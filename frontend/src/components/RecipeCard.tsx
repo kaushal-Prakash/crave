@@ -3,6 +3,7 @@ import { recipe } from "@/types/types";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { MdOutlinePushPin } from "react-icons/md";
+import { MdDeleteForever } from "react-icons/md";
 import { HiOutlinePencilSquare } from "react-icons/hi2";
 import { toast } from "react-toastify";
 import axios from "axios";
@@ -58,6 +59,27 @@ function RecipeCard({ title, description, created_at, id, user_id }: recipe) {
     }
   };
 
+  const handleDelete = async () => {
+    setIsPinning(true);
+    try {
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}recipes/delete-recipe/${id}`,
+        { withCredentials: true }
+      );
+
+      if (res.status === 200) {
+        toast.success(res.data.message);
+      } else {
+        toast.error("Failed to add delete recipe");
+      }
+    } catch (error) {
+      console.log("Error adding favorites: ", error);
+      toast.error("Internal server error! Please try again.");
+    } finally {
+      setIsPinning(false);
+    }
+  };
+
   return (
     <div className="bg-white p-4 rounded-lg shadow-inner hover:shadow-lg transition-all duration-300 ease-in-out max-h-60 flex flex-col justify-between hover:-translate-y-2 relative">
       <div>
@@ -80,6 +102,16 @@ function RecipeCard({ title, description, created_at, id, user_id }: recipe) {
             <HiOutlinePencilSquare size={25} />
           </button>
         )}
+
+        {currentUserId === user_id && (
+          <button
+            className="absolute right-20 top-3 cursor-pointer transition-all hover:shadow-2xl duration-200 hover:text-orange-600 hover:scale-110 backface-hidden"
+            onClick={handleDelete}
+          >
+            <MdDeleteForever size={25} />
+          </button>
+        )}
+
         <h3 className="text-lg font-semibold mt-3 text-gray-800">{title}</h3>
         <p
           className="text-sm text-gray-600 mt-2"
