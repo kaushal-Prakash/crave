@@ -1,5 +1,6 @@
 "use client";
 import axios from "axios";
+import Link from "next/link";
 import React, { useState } from "react";
 import { toast } from "react-toastify";
 
@@ -84,9 +85,9 @@ function LoginPage() {
 
         <p className="text-center text-gray-600 mt-4">
           Don't have an account?{" "}
-          <a href="#" className="text-orange-600 font-semibold hover:underline">
+          <Link href="/signup" className="text-orange-600 font-semibold hover:underline">
             Sign up
-          </a>
+          </Link>
         </p>
       </div>
     </div>
