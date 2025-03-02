@@ -68,7 +68,7 @@ function FavPage() {
         />
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 min-h-screen">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {paginatedRecipes?.length > 0 ? (
           paginatedRecipes?.map((recipe) => (
             <RecipeCard
