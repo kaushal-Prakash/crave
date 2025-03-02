@@ -95,7 +95,7 @@ function RecipeCard({
   };
 
   const handleUpdate = () => {
-    onUpdate(); // Call the onUpdate prop to refresh the recipes
+    onUpdate(); 
     router.push(`/update-recipe/${id}`);
   };
 
@@ -116,7 +116,7 @@ function RecipeCard({
         {currentUserId === user_id && (
           <button
             className="absolute right-12 top-3 cursor-pointer transition-all hover:shadow-2xl duration-200 hover:text-orange-600 hover:scale-110 backface-hidden"
-            onClick={handleUpdate} // Use handleUpdate instead of direct navigation
+            onClick={handleUpdate} 
           >
             <HiOutlinePencilSquare size={25} />
           </button>

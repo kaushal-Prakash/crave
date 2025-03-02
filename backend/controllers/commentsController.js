@@ -7,19 +7,35 @@ const addComments = async (req, res) => {
     const { content } = req.body;
 
     if (!content) {
-      return res.status(404).json({ message: "Add all comment details first" });
+      return res.status(400).json({ message: "Add all comment details first" });
     }
 
     const connection = await connectDB();
+
+    const [existingComments] = await connection.execute(
+      "SELECT id FROM comments WHERE user_id = ? AND recipe_id = ?",
+      [userId, recipeId]
+    );
+
+    if (existingComments.length > 0) {
+      return res
+        .status(200)
+        .json({ message: "You have already commented on this recipe" });
+    }
+
     const [result] = await connection.execute(
       "INSERT INTO comments (content, user_id, recipe_id) VALUES (?, ?, ?)",
       [content, userId, recipeId]
     );
 
-    console.log(result);
-    return res.status(200).json({ result });
+    return res
+      .status(200)
+      .json({
+        message: "Comment added successfully",
+        commentId: result.insertId,
+      });
   } catch (error) {
-    console.log("Error adding comments : ", error);
+    console.error("Error adding comments:", error);
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };

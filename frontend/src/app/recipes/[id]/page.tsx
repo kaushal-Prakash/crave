@@ -5,6 +5,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { MdOutlinePushPin } from "react-icons/md";
 import { recipe } from "@/types/types";
+import CommentComponent from "@/components/Comments";
 
 function RecipeDetailPage() {
   const { id } = useParams();
@@ -25,7 +26,6 @@ function RecipeDetailPage() {
           throw new Error("Error fetching recipe");
         }
         setRecipe(response.data[0]);
-        console.log(response.data[0]);
       } catch (error) {
         console.error(error);
         setError("Failed to fetch recipe. Please try again later.");
@@ -94,6 +94,8 @@ function RecipeDetailPage() {
           Back to Last Page
         </button>
       </div>
+
+      <CommentComponent  recipeId={Number(id)}/>
     </div>
   );
 }

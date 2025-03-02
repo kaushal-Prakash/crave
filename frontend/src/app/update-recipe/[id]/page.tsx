@@ -36,9 +36,9 @@ function EditRecipePage() {
             });
             
             quill.root.style.fontSize = "16px";
-            quill.root.innerHTML = recipe.description; // Set the initial content
+            quill.root.innerHTML = recipe.description; 
             quill.on("text-change", () => {
-              setDescription(quill.root.innerHTML); // Update description state
+              setDescription(quill.root.innerHTML); 
             });
           }
         } else {
