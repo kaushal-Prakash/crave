@@ -1,45 +1,79 @@
 # Crave - Recipe Sharing Platform
 
-## Project Overview
+## Overview
+Crave is a user-friendly platform designed for food enthusiasts to share and discover new recipes. Users can sign up, upload their favorite dishes, browse community recipes, and engage with others through comments.
 
-Crave is a simple and user-friendly recipe-sharing platform where users can:
-
-- Sign up & log in to share their favorite recipes.
-- Browse recipes uploaded by other users.
-- Add, edit, and delete their own recipes.
-- Like & save recipes for future reference.
+## Features
+- **User Authentication**: Secure login and signup using JWT and HTTP-only cookies.
+- **Recipe Management**: Users can add, edit, and delete their own recipes.
+- **Browsing & Discovery**: Explore recipes shared by other users.
+- **Comments Section**: Engage with the community by commenting on recipes.
+- **Image Upload**: Upload images to make recipes more appealing.
 
 ## Tech Stack
-
 ### Frontend:
-
-- **Next.js** – For building the UI
-- **Zustand** – For state management
-- **Axios** – For API requests
+- **Next.js** – Modern React framework for UI development.
+- **Zustand** – Lightweight state management solution.
+- **Axios** – Simplifies API requests.
+- **Sass** – Enhances styling capabilities.
 
 ### Backend:
+- **Express.js** – Handles REST API requests.
+- **MySQL** – Stores user and recipe data efficiently.
+- **JWT & HTTP-only Cookies** – Ensures secure authentication.
 
-- **Express.js** – For building the REST API
-- **MySQL** – For storing user and recipe data
-- **JWT & HTTP-only Cookies** – For authentication
-
-## Team Members
-
-- **Kaushal Prakash**
-- **Jayantilal**
-- **Ibaadur Rehman**
+## Installation & Setup
+1. **Clone the repository**
+   ```sh
+   git clone https://github.com/your-repo/crave.git
+   cd crave
+   ```
+2. **Install dependencies**
+   ```sh
+   # Frontend
+   cd frontend
+   npm install
+   ```
+   ```sh
+   # Backend
+   cd backend
+   npm install
+   ```
+3. **Configure environment variables**
+   - Set up `.env` files for both frontend and backend.
+4. **Run the application**
+   ```sh
+   # Start backend
+   npm run dev
+   ```
+   ```sh
+   # Start frontend
+   npm run dev
+   ```
 
 ## API Endpoints
-- **Authentication**
-- **Recipes**
+### Authentication
+- `POST /api/user-signup` - User registration
+- `POST /api/user-login` - User login
+- `GET /api/user-logout` - User logout
+- `GET /api/is-loged-in` - Check if user is logged in
+- `GET /api/get-user` - Get current user details
+- `GET /api/get-user-by-id` - Get user details by ID
 
-## Features to Implement Next
-- ✅ User Authentication (JWT + Cookies)
-- ✅ Add/Edit/Delete Recipes
-- ✅ Browse Recipes
-- 🔲 Like & Save Recipes
-- 🔲 Image Upload for Recipes
-- 🔲 Comments on Recipes
+### Recipes
+- `POST /api/add-recipe` - Add a new recipe
+- `POST /api/update-recipe` - Edit a recipe
+- `POST /api/get-recipe-by-id` - Get a recipe by ID
+- `GET /api/get-recipes` - Fetch all recipes
+- `GET /api/get-user-recipes` - Fetch all recipes by a user
+- `GET /api/delete-recipe/:id` - Delete a recipe
+
+### Comments
+- `POST /api/add/:id` - Add a comment to a recipe
+- `POST /api/update/:id` - Edit a comment
+- `GET /api/get-recipe-comments/:id` - Fetch comments for a recipe
+- `GET /api/delete/:id` - Delete a comment
 
 ## License
 This project is open-source and free to use.
+
