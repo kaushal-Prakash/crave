@@ -11,35 +11,34 @@ function FavPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [recipes, setRecipes] = useState<recipe[]>([]);
+  const [refreshFavorites, setRefreshFavorites] = useState(false);
 
   useEffect(() => {
     const getRecipes = async () => {
       try {
         const res = await axios.get(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}users/get-user-fav`,{
-            withCredentials: true
-          }
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}users/get-user-fav`,
+          { withCredentials: true }
         );
 
         if (res.status === 200) {
           setRecipes(res.data.favorites);
-        } 
-        else if(res.status === 404){
-            toast.error(res.data.message);
-        }
-        else {
+        } else if (res.status === 404) {
+          toast.error(res.data.message);
+        } else {
           toast.error("Error fetching recipes");
         }
       } catch (error) {
         console.log(error);
+        toast.error("Failed to fetch favorite recipes");
       }
     };
 
     getRecipes();
-  }, []);
+  }, [refreshFavorites]);
 
   const filteredRecipes = recipes?.filter((recipe) =>
-    recipe.title.toLowerCase().includes(searchQuery.toLowerCase()) 
+    recipe.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const totalPages = Math.ceil(filteredRecipes?.length / ITEMS_PER_PAGE);
@@ -52,6 +51,10 @@ function FavPage() {
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [currentPage]);
+
+  const handleRefreshFavorites = () => {
+    setRefreshFavorites((prev) => !prev);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-200 to-yellow-200 p-8">
@@ -68,7 +71,12 @@ function FavPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 min-h-screen">
         {paginatedRecipes?.length > 0 ? (
           paginatedRecipes?.map((recipe) => (
-            <RecipeCard key={recipe.id} {...recipe}/>
+            <RecipeCard
+              key={recipe.id}
+              {...recipe} 
+              onDelete={handleRefreshFavorites}
+              onUpdate={handleRefreshFavorites} 
+            />
           ))
         ) : (
           <p className="col-span-full text-center text-gray-700">

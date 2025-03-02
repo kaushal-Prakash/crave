@@ -11,14 +11,14 @@ function MyRecipes() {
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [recipes, setRecipes] = useState<recipe[]>([]);
+  const [refreshRecipes, setRefreshRecipes] = useState(false); 
 
   useEffect(() => {
     const getRecipes = async () => {
       try {
         const res = await axios.get(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}recipes/get-user-recipes`,{
-            withCredentials: true
-          }
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}recipes/get-user-recipes`,
+          { withCredentials: true }
         );
 
         if (res.status === 200) {
@@ -33,10 +33,10 @@ function MyRecipes() {
     };
 
     getRecipes();
-  }, []);
+  }, [refreshRecipes]); 
 
   const filteredRecipes = recipes?.filter((recipe) =>
-    recipe.title.toLowerCase().includes(searchQuery.toLowerCase()) 
+    recipe.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const totalPages = Math.ceil(filteredRecipes?.length / ITEMS_PER_PAGE);
@@ -49,6 +49,10 @@ function MyRecipes() {
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [currentPage]);
+
+  const handleRefreshRecipes = () => {
+    setRefreshRecipes((prev) => !prev); 
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-200 to-yellow-200 p-8">
@@ -65,7 +69,12 @@ function MyRecipes() {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 min-h-screen">
         {paginatedRecipes?.length > 0 ? (
           paginatedRecipes?.map((recipe) => (
-            <RecipeCard key={recipe.id} {...recipe}/>
+            <RecipeCard
+              key={recipe.id}
+              {...recipe} // Spread all recipe properties
+              onDelete={handleRefreshRecipes} // Pass refresh function for delete
+              onUpdate={handleRefreshRecipes} // Pass refresh function for update
+            />
           ))
         ) : (
           <p className="col-span-full text-center text-gray-700">

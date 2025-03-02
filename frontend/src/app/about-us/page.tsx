@@ -26,7 +26,7 @@ function AboutUsPage() {
 
           <p className="text-lg text-gray-800 leading-relaxed">
             Our mission is to bring people together through the joy of cooking.
-            Whether you're a seasoned chef or a beginner in the kitchen, Crave
+            Whether you&apos;re a seasoned chef or a beginner in the kitchen, Crave
             has something for everyone. Explore our collection of recipes, share
             your own creations, and connect with a community of food lovers.
           </p>
@@ -70,7 +70,7 @@ function AboutUsPage() {
           </div>
 
           <p className="text-lg text-gray-800 leading-relaxed mt-8">
-            Together, we've built Crave with love and dedication. We hope you
+            Together, we&apos;ve built Crave with love and dedication. We hope you
             enjoy using it as much as we enjoyed creating it. Happy cooking!
           </p>
         </div>

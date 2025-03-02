@@ -8,7 +8,7 @@ function NotFound() {
       <FaExclamationTriangle className="text-orange-600 text-6xl mb-4 animate-bounce" />
 
       <h1 className="text-5xl font-bold text-gray-800">404</h1>
-      <p className="text-lg text-gray-600 mt-2">Oops! The page you're looking for doesn't exist.</p>
+      <p className="text-lg text-gray-600 mt-2">Oops! The page you&apos;re looking for doesn&apos;t exist.</p>
 
       <Link
         href="/home"
