@@ -45,4 +45,19 @@ const getRecipeComments = async (req, res) => {
   }
 };
 
-export { addComments, getRecipeComments };
+const deleteComment = async (req,res) => {
+    try {
+        const {id : commentId} = req.params;
+
+        const connection = await connectDB();
+        const [result] = await connection.execute("delete from comments where id = ?",[commentId]);
+
+        return res.status(200).json({message : "Comment successfully deletd",result});
+
+    } catch (error) {
+        console.log("Error deleting comment : ",error);
+        return res.status(500).json({message : "Internal Server Error"})
+    }
+}
+
+export { addComments, getRecipeComments, deleteComment };
