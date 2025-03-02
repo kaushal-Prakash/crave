@@ -78,7 +78,7 @@ function CommentComponent({ recipeId }: CommentComponentProps) {
         setComments(updatedComments.data.result);
       }
     } catch (error) {
-      console.error("Error adding comment:", error); // Log the error for debugging
+      console.error("Error adding comment:", error); 
       toast.error("Failed to add comment");
     } finally {
       setIsSubmitting(false);
