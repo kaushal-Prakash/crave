@@ -23,7 +23,6 @@ function HomePage() {
 
         if (res.status === 200) {
           setRecipes(res.data.recipes);
-          console.log(res.data.recipes)
         } else {
           toast.error("Error fetching recipes");
         }

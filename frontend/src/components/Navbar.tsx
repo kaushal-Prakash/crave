@@ -100,6 +100,13 @@ function Navbar() {
             >
               My Recipes
             </Link>
+            <Link
+              href="/favorites"
+              onClick={() => setIsOpen(false)}
+              className="text-gray-800 hover:text-appetizingRed hover:scale-110 hover:underline transition-all duration-100 cursor-pointer"
+            >
+              Favorites
+            </Link>
             <button
               onClick={handleLogout}
               className="text-gray-800 hover:text-appetizingRed hover:scale-110 hover:underline transition-all duration-100 cursor-pointer"
