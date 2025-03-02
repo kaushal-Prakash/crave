@@ -28,12 +28,12 @@ function RecipeCard({ title, description, created_at,id }: recipe) {
   const handleClick = async () => {
     try {
       const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}users/add-to-fav?id=${id}`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}users/add-to-fav/${id}`,
         { withCredentials: true }
       );
   
       if (res.status === 200) {
-        toast.success("Recipe added to favorites!");
+        toast.success(res.data.message);
       } else {
         toast.error("Failed to add recipe to favorites");
       }

@@ -82,17 +82,17 @@ const userLogin = async (req, res) => {
   }
 };
 
-const isLogedIn = async (req,res)=> {
+const isLogedIn = async (req, res) => {
   try {
     const userId = req.user;
-    if(!userId){
-      return res.status(404).json({message : "No token found"});
+    if (!userId) {
+      return res.status(404).json({ message: "No token found" });
     }
-    return res.status(200).json({message : "User is genuine"});
+    return res.status(200).json({ message: "User is genuine" });
   } catch (error) {
-    console.log("Error during validating login : ",error)
+    console.log("Error during validating login : ", error);
   }
-}
+};
 
 const userLogout = async (req, res) => {
   try {
@@ -125,7 +125,7 @@ const addRecipe = async (req, res) => {
         .status(401)
         .json({ message: "Unauthorized: No token provided" });
     }
-    const {userId} = req.user;
+    const { userId } = req.user;
 
     if (!userId) {
       return res.status(400).json({ message: "User ID missing from token!" });
@@ -137,12 +137,10 @@ const addRecipe = async (req, res) => {
       [title, description, userId]
     );
 
-    res
-      .status(200)
-      .json({
-        message: "Recipe added successfully!",
-        recipeId: result.insertId,
-      });
+    res.status(200).json({
+      message: "Recipe added successfully!",
+      recipeId: result.insertId,
+    });
   } catch (error) {
     console.error("Error in adding recipe! :", error);
     res.status(500).json({ message: "Internal Server Error" });
@@ -151,9 +149,9 @@ const addRecipe = async (req, res) => {
 
 const addToFavorite = async (req, res) => {
   try {
-    const { userId } = req.user; 
+    const { userId } = req.user;
     const { id: recipeId } = req.params;
-    console.log(req.params)
+    console.log(req.params);
     const connection = await connectDB();
     const [recipe] = await connection.execute(
       "SELECT * FROM recipes WHERE id = ?",
@@ -188,4 +186,36 @@ const addToFavorite = async (req, res) => {
   }
 };
 
-export { userSignup, userLogin, addRecipe, userLogout ,isLogedIn,addToFavorite};
+const getUserFav = async (req, res) => {
+  try {
+    const { userId } = req.user;
+    const connection = await connectDB();
+    
+    const [result] = await connection.execute(
+      `SELECT r.*
+       FROM favorites f
+       JOIN recipes r ON f.recipe_id = r.id
+       WHERE f.user_id = ?`,
+      [userId]
+    );
+
+    if (result.length === 0) {
+      return res.status(404).json({ message: "No favorite recipe found" });
+    }
+
+    return res.status(200).json({ favorites: result });
+  } catch (error) {
+    console.log("Error fetching favorite recipes: ", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+export {
+  userSignup,
+  userLogin,
+  addRecipe,
+  userLogout,
+  isLogedIn,
+  addToFavorite,
+  getUserFav,
+};

@@ -7,8 +7,7 @@ import { toast } from "react-toastify";
 
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // State to track login status
-
+  const [isLoggedIn, setIsLoggedIn] = useState(false); 
   useEffect(() => {
     const checkAuthStatus = async () => {
       try {
