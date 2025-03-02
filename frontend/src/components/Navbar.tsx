@@ -7,11 +7,15 @@ import { toast } from "react-toastify";
 
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false); 
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
   useEffect(() => {
     const checkAuthStatus = async () => {
       try {
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}users/is-loged-in`,{withCredentials: true});
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}users/is-loged-in`,
+          { withCredentials: true }
+        );
 
         if (response.status == 200) {
           setIsLoggedIn(true);
@@ -26,24 +30,31 @@ function Navbar() {
 
     checkAuthStatus();
   }, []);
-  
+
   const handleLogout = async () => {
     try {
-      const res = await axios(`${process.env.NEXT_PUBLIC_BACKEND_URL}users/user-logout`,{withCredentials : true});
+      const res = await axios(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}users/user-logout`,
+        { withCredentials: true }
+      );
 
-      if(res.status == 200){
+      if (res.status == 200) {
+        localStorage.removeItem("currentUserId");
         toast.success(res.data.message);
         window.location.href = "/login";
       }
     } catch (error) {
-      console.log("Error during logout : ",error)
+      console.log("Error during logout : ", error);
     }
   };
 
   return (
     <nav className="fixed top-0 left-0 w-full p-5 flex justify-between items-center shadow-md z-50 backdrop-blur-sm rounded-b-2xl">
       {/* Logo */}
-      <div className="text-2xl font-bold text-appetizingRed text-amber-950 tracking-widest cursor-pointer" onClick={ () => window.location.href = "/"}>
+      <div
+        className="text-2xl font-bold text-appetizingRed text-amber-950 tracking-widest cursor-pointer"
+        onClick={() => (window.location.href = "/")}
+      >
         Crave.
       </div>
 

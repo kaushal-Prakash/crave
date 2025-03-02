@@ -99,6 +99,16 @@ const getUserById = async (req,res)=>{
   }
 }
 
+const currentuser = async (req,res) =>{
+  try {
+    const {userId} = req.user;
+    return res.status(200).json({userId : userId})
+  } catch (error) {
+    console.log("Error sending currnt user : ",error)
+    return res.status(500).json({message : "Internal Server Error"})
+  }
+}
+
 const isLogedIn = async (req, res) => {
   try {
     const userId = req.user;
@@ -235,5 +245,6 @@ export {
   isLogedIn,
   addToFavorite,
   getUserFav,
-  getUserById
+  getUserById,
+  currentuser
 };

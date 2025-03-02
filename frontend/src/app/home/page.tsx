@@ -16,9 +16,8 @@ function HomePage() {
     const getRecipes = async () => {
       try {
         const res = await axios.get(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}recipes/get-recipes`,{
-            withCredentials: true
-          }
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}recipes/get-recipes`,
+          { withCredentials: true }
         );
 
         if (res.status === 200) {
@@ -32,11 +31,27 @@ function HomePage() {
       }
     };
 
+    const fetchCurrentUser = async () => {
+      try {
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}users/get-user`,
+          { withCredentials: true }
+        );
+
+        if (response.status === 200) {
+          localStorage.setItem("currentUserId", response.data.id);
+        }
+      } catch (error) {
+        console.error("Error fetching current user:", error);
+      }
+    };
+
     getRecipes();
+    fetchCurrentUser();
   }, []);
 
   const filteredRecipes = recipes.filter((recipe) =>
-    recipe.title.toLowerCase().includes(searchQuery.toLowerCase()) 
+    recipe.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const totalPages = Math.ceil(filteredRecipes.length / ITEMS_PER_PAGE);
@@ -65,7 +80,7 @@ function HomePage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 min-h-screen">
         {paginatedRecipes.length > 0 ? (
           paginatedRecipes.map((recipe) => (
-            <RecipeCard key={recipe.id} {...recipe}/>
+            <RecipeCard key={recipe.id} {...recipe} />
           ))
         ) : (
           <p className="col-span-full text-center text-gray-700">
