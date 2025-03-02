@@ -25,7 +25,7 @@ function RecipeDetailPage() {
           throw new Error("Error fetching recipe");
         }
         setRecipe(response.data[0]);
-        console.log(response.data[0])
+        console.log(response.data[0]);
       } catch (error) {
         console.error(error);
         setError("Failed to fetch recipe. Please try again later.");
@@ -81,12 +81,15 @@ function RecipeDetailPage() {
         </h1>
 
         {/* Recipe Description */}
-        <p className="text-lg text-gray-700 mb-8">{recipe?.description}</p>
+        <div
+          className="text-lg text-gray-700 mb-8 quill-content"
+          dangerouslySetInnerHTML={{ __html: recipe?.description || "" }}
+        ></div>
 
         {/* Back Button */}
         <button
           onClick={handleBack}
-          className="bg-gradient-to-r from-orange-400 to-yellow-500 text-white px-6 py-2 rounded-lg hover:from-orange-500 hover:to-yellow-600 transition-all duration-300 font-semibold shadow-md"
+          className="bg-gradient-to-r from-orange-400 to-yellow-500 text-white px-6 py-2 rounded-lg hover:from-orange-500 hover:to-yellow-600 transition-all duration-300 font-semibold shadow-md cursor-pointer"
         >
           Back to Recipes
         </button>

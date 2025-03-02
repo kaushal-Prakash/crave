@@ -149,4 +149,43 @@ const addRecipe = async (req, res) => {
   }
 };
 
-export { userSignup, userLogin, addRecipe, userLogout ,isLogedIn};
+const addToFavorite = async (req, res) => {
+  try {
+    const { userId } = req.user; 
+    const { id: recipeId } = req.params;
+    console.log(req.params)
+    const connection = await connectDB();
+    const [recipe] = await connection.execute(
+      "SELECT * FROM recipes WHERE id = ?",
+      [recipeId]
+    );
+
+    if (recipe.length === 0) {
+      return res.status(404).json({ message: "Recipe not found" });
+    }
+
+    const [favorite] = await connection.execute(
+      "SELECT * FROM favorites WHERE user_id = ? AND recipe_id = ?",
+      [userId, recipeId]
+    );
+
+    if (favorite.length > 0) {
+      await connection.execute(
+        "DELETE FROM favorites WHERE user_id = ? AND recipe_id = ?",
+        [userId, recipeId]
+      );
+      return res.status(200).json({ message: "Recipe removed from favorites" });
+    } else {
+      await connection.execute(
+        "INSERT INTO favorites (user_id, recipe_id) VALUES (?, ?)",
+        [userId, recipeId]
+      );
+      return res.status(200).json({ message: "Recipe added to favorites" });
+    }
+  } catch (error) {
+    console.error("Error toggling favorites:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+export { userSignup, userLogin, addRecipe, userLogout ,isLogedIn,addToFavorite};

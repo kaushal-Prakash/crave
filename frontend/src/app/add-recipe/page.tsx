@@ -1,14 +1,42 @@
-"use client"; 
-import React, { useState } from "react";
+"use client";
+import React, { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { toast } from "react-toastify";
+import "quill/dist/quill.snow.css";
 
 function AddRecipePage() {
   const router = useRouter();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(false);
+  const quillRef = useRef(null); // Ref for Quill editor
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && quillRef.current) {
+      // Dynamically import Quill to avoid SSR issues
+      const Quill = require("quill").default;
+
+      const quill = new Quill(quillRef.current, {
+        theme: "snow",
+        placeholder: "Enter recipe description...",
+      });
+
+      // Set a custom height for the editor
+      quill.root.style.height = "300px";
+      quill.root.style.fontSize = "16px";
+
+      // Update description state when Quill content changes
+      quill.on("text-change", () => {
+        setDescription(quill.root.innerHTML); // Get HTML content
+      });
+
+      // Cleanup Quill instance on unmount
+      return () => {
+        quill.off("text-change");
+      };
+    }
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,14 +90,11 @@ function AddRecipePage() {
             <label className="block text-lg font-semibold text-green-700 mb-2">
               Description
             </label>
-            <textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Enter recipe description"
-              rows={4}
-              className="w-full px-4 py-2 rounded-lg border-2 border-orange-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-300 outline-none transition-all"
-              required
-            />
+            <div
+              ref={quillRef}
+              className="bg-white rounded-lg quill-custom-font" // Add custom class
+              style={{ height: "300px" }} // Set height for the container
+            ></div>
           </div>
 
           {/* Submit Button */}

@@ -56,4 +56,21 @@ const updateRecipe = async (req,res) => {
     }
 }
 
-export { getRecipes, getRecipeById ,updateRecipe};
+const getUserRecipes = async (req,res) => {
+  try {
+    const {userId} = req.user;
+    const connection = await connectDB();
+    const [result] = await connection.execute("select * from recipes where user_id = ?",[userId]);
+
+    if(result.length === 0){
+      return res.status(404).json({message : "No recipes found"})
+    }
+
+    return res.status(200).json({result});
+  } catch (error) {
+    console.log("Error fetching user recipes : ",error)
+    return res.status(500).json({message : "Internal Server Error"})
+  }
+}
+
+export { getRecipes, getRecipeById ,updateRecipe, getUserRecipes};
