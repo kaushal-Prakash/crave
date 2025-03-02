@@ -1,8 +1,9 @@
 import express from "express";
-import { createComment, getCommentsByRecipe } from "../models/Comment.js";
+import { getRecipeComments } from "../controllers/commentsController.js";
 
 const router = express.Router();
 
+router.get("/get-recipe-comments/:id",getRecipeComments);
 router.post("/add", async (req, res) => {
   const { content, user_id, recipe_id } = req.body;
   if (!content || !user_id || !recipe_id) {
