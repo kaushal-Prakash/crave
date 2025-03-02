@@ -2,7 +2,7 @@ interface recipe {
     id: number;
     title: string;
     description: string;
-    userId: number;
+    user_id: number;
     created_at: string;
   }
   

@@ -10,32 +10,34 @@ function AddRecipePage() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(false);
-  const quillRef = useRef(null); // Ref for Quill editor
+  const quillRef = useRef<HTMLDivElement>(null); 
+  const quillInstance = useRef<any>(null); 
 
   useEffect(() => {
     if (typeof window !== "undefined" && quillRef.current) {
-      // Dynamically import Quill to avoid SSR issues
-      const Quill = require("quill").default;
+      import("quill").then(({ default: Quill }) => {
+        if (!quillInstance.current && quillRef.current) {null
+          quillInstance.current = new Quill(quillRef.current, {
+            theme: "snow",
+            placeholder: "Enter recipe description...",
+          });
 
-      const quill = new Quill(quillRef.current, {
-        theme: "snow",
-        placeholder: "Enter recipe description...",
+          quillInstance.current.root.style.height = "300px";
+          quillInstance.current.root.style.fontSize = "16px";
+
+          quillInstance.current.on("text-change", () => {
+            setDescription(quillInstance.current.root.innerHTML);
+          });
+        }
       });
-
-      // Set a custom height for the editor
-      quill.root.style.height = "300px";
-      quill.root.style.fontSize = "16px";
-
-      // Update description state when Quill content changes
-      quill.on("text-change", () => {
-        setDescription(quill.root.innerHTML); // Get HTML content
-      });
-
-      // Cleanup Quill instance on unmount
-      return () => {
-        quill.off("text-change");
-      };
     }
+
+    return () => {
+      if (quillInstance.current) {
+        quillInstance.current.off("text-change");
+        quillInstance.current = null;
+      }
+    };
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -57,6 +59,7 @@ function AddRecipePage() {
       }
     } catch (error) {
       console.error(error);
+      toast.error("An error occurred while adding the recipe.");
     } finally {
       setLoading(false);
     }
@@ -92,8 +95,8 @@ function AddRecipePage() {
             </label>
             <div
               ref={quillRef}
-              className="bg-white rounded-lg quill-custom-font" // Add custom class
-              style={{ height: "300px" }} // Set height for the container
+              className="bg-white rounded-lg quill-custom-font"
+              style={{ height: "300px" }}
             ></div>
           </div>
 

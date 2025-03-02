@@ -39,7 +39,7 @@ function HomePage() {
         );
 
         if (response.status === 200) {
-          localStorage.setItem("currentUserId", response.data.id);
+          localStorage.setItem("currentUserId", response.data.userId);
         }
       } catch (error) {
         console.error("Error fetching current user:", error);

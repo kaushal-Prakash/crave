@@ -7,7 +7,7 @@ import { HiOutlinePencilSquare } from "react-icons/hi2";
 import { toast } from "react-toastify";
 import axios from "axios";
 
-function RecipeCard({ title, description, created_at, id, userId }: recipe) {
+function RecipeCard({ title, description, created_at, id, user_id }: recipe) {
   const router = useRouter();
   const [isPinning, setIsPinning] = useState(false);
   const [currentUserId, setCurrentUserId] = useState<number | null>(null);
@@ -72,7 +72,7 @@ function RecipeCard({ title, description, created_at, id, userId }: recipe) {
           />
         </button>
 
-        {currentUserId === userId && (
+        {currentUserId === user_id && (
           <button
             className="absolute right-12 top-3 cursor-pointer transition-all hover:shadow-2xl duration-200 hover:text-orange-600 hover:scale-110 backface-hidden"
             onClick={() => (window.location.href = `/update-recipe/${id}`)}
