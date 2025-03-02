@@ -82,32 +82,35 @@ const userLogin = async (req, res) => {
   }
 };
 
-const getUserById = async (req,res)=>{
+const getUserById = async (req, res) => {
   try {
-    const {userId} = req.user;
+    const { userId } = req.user;
     const connection = await connectDB();
-    const [result] = await connection.execute("select * from users where id = ?",[userId]);
+    const [result] = await connection.execute(
+      "select * from users where id = ?",
+      [userId]
+    );
 
-    if(result.length === 0){
-      return res.status(404).json({message : "No user Found"});
+    if (result.length === 0) {
+      return res.status(404).json({ message: "No user Found" });
     }
 
-    return res.status(200).json({result})
+    return res.status(200).json({ result });
   } catch (error) {
-    console.log("Error getting user : ",error);
-    return res.status(500).json({message : "Internal Server Error"})
+    console.log("Error getting user : ", error);
+    return res.status(500).json({ message: "Internal Server Error" });
   }
-}
+};
 
-const currentuser = async (req,res) =>{
+const currentuser = async (req, res) => {
   try {
-    const {userId} = req.user;
-    return res.status(200).json({userId : userId})
+    const { userId } = req.user;
+    return res.status(200).json({ userId: userId });
   } catch (error) {
-    console.log("Error sending currnt user : ",error)
-    return res.status(500).json({message : "Internal Server Error"})
+    console.log("Error sending currnt user : ", error);
+    return res.status(500).json({ message: "Internal Server Error" });
   }
-}
+};
 
 const isLogedIn = async (req, res) => {
   try {
@@ -216,7 +219,7 @@ const getUserFav = async (req, res) => {
   try {
     const { userId } = req.user;
     const connection = await connectDB();
-    
+
     const [result] = await connection.execute(
       `SELECT r.*
        FROM favorites f
@@ -245,5 +248,5 @@ export {
   addToFavorite,
   getUserFav,
   getUserById,
-  currentuser
+  currentuser,
 };

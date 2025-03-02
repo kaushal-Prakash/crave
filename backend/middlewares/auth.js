@@ -1,14 +1,21 @@
 import jwt from "jsonwebtoken";
 
 const authMiddleware = (req, res, next) => {
-  const openRoutes = ["/users/user-login", "/users/user-signup","/","/users/isLogedIn"];
+  const openRoutes = [
+    "/users/user-login",
+    "/users/user-signup",
+    "/",
+    "/users/isLogedIn",
+  ];
   if (openRoutes.includes(req.path)) {
     return next();
   }
 
-  const token = req.cookies.token; 
+  const token = req.cookies.token;
   if (!token) {
-    return res.status(401).json({ message: "Access denied. No token provided." });
+    return res
+      .status(401)
+      .json({ message: "Access denied. No token provided." });
   }
 
   try {
