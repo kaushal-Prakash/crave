@@ -13,7 +13,6 @@ Crave is a user-friendly platform designed for food enthusiasts to share and dis
 ## Tech Stack
 ### Frontend:
 - **Next.js** – Modern React framework for UI development.
-- **Zustand** – Lightweight state management solution.
 - **Axios** – Simplifies API requests.
 - **Sass** – Enhances styling capabilities.
 
