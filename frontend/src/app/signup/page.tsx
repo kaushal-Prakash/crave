@@ -98,7 +98,7 @@ function SignupPage() {
             type="button"
             className={`w-full ${
               busy ? "bg-orange-300 cursor-not-allowed" : "bg-orange-500"
-            } text-white py-3 rounded-lg text-lg font-semibold hover:bg-orange-600 transition-all duration-300`}
+            } text-white py-3 rounded-lg text-lg font-semibold hover:bg-orange-600 transition-all cursor-pointer duration-300`}
             onClick={handleSignup}
             disabled={busy} 
           >

@@ -86,7 +86,7 @@ function LoginPage() {
 
         <p className="text-center text-gray-600 mt-4">
           Don&apos;t have an account?{" "}
-          <Link href="/signup" className="text-orange-600 font-semibold hover:underline">
+          <Link href="/signup" className="text-orange-600 font-semibold cursor-pointer hover:underline">
             Sign up
           </Link>
         </p>
