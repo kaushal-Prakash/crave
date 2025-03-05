@@ -14,6 +14,10 @@ function SignupPage() {
 
   const handleSignup = async () => {
     if (busy) return;
+    if(password.length < 8){
+      toast.info("Password must have atleast 8 characters !");
+      return;
+    }
 
     setBusy(true);
     try {
@@ -22,12 +26,12 @@ function SignupPage() {
         { fullName, username, email, password },
         { withCredentials: true }
       );
-
+      console.log(res)
       if (res.status === 200) {
         toast.success("User registered successfully");
         window.location.href = "/home";
       } else {
-        toast.error(res.data.message || "Signup failed");
+        toast.error(res.data.message);
       }
     } catch (error: any) {
       console.log("Error in user signup:", error);
