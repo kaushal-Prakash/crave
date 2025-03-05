@@ -8,7 +8,6 @@ Crave is a user-friendly platform designed for food enthusiasts to share and dis
 - **Recipe Management**: Users can add, edit, and delete their own recipes.
 - **Browsing & Discovery**: Explore recipes shared by other users.
 - **Comments Section**: Engage with the community by commenting on recipes.
-- **Image Upload**: Upload images to make recipes more appealing.
 
 ## Tech Stack
 ### Frontend:
