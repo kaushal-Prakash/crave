@@ -51,26 +51,26 @@ Crave is a user-friendly platform designed for food enthusiasts to share and dis
 
 ## API Endpoints
 ### Authentication
-- `POST /api/user-signup` - User registration
-- `POST /api/user-login` - User login
-- `GET /api/user-logout` - User logout
-- `GET /api/is-loged-in` - Check if user is logged in
-- `GET /api/get-user` - Get current user details
-- `GET /api/get-user-by-id` - Get user details by ID
+- `POST /users/user-signup` - User registration
+- `POST /users/user-login` - User login
+- `GET /users/user-logout` - User logout
+- `GET /users/is-loged-in` - Check if user is logged in
+- `GET /users/get-user` - Get current user details
+- `GET /users/get-user-by-id` - Get user details by ID
 
 ### Recipes
-- `POST /api/add-recipe` - Add a new recipe
-- `POST /api/update-recipe` - Edit a recipe
-- `POST /api/get-recipe-by-id` - Get a recipe by ID
-- `GET /api/get-recipes` - Fetch all recipes
-- `GET /api/get-user-recipes` - Fetch all recipes by a user
-- `GET /api/delete-recipe/:id` - Delete a recipe
+- `POST /users/add-recipe` - Add a new recipe
+- `POST /recipes/update-recipe` - Edit a recipe
+- `POST /recipes/get-recipe-by-id` - Get a recipe by ID
+- `GET /recipes/get-recipes` - Fetch all recipes
+- `GET /recipes/get-user-recipes` - Fetch all recipes by a user
+- `GET /recipes/delete-recipe/:id` - Delete a recipe
 
 ### Comments
-- `POST /api/add/:id` - Add a comment to a recipe
-- `POST /api/update/:id` - Edit a comment
-- `GET /api/get-recipe-comments/:id` - Fetch comments for a recipe
-- `GET /api/delete/:id` - Delete a comment
+- `POST /comments/add/:id` - Add a comment to a recipe
+- `POST /comments/update/:id` - Edit a comment
+- `GET /comments/get-recipe-comments/:id` - Fetch comments for a recipe
+- `GET /comments/delete/:id` - Delete a comment
 
 ## License
 This project is open-source and free to use.
