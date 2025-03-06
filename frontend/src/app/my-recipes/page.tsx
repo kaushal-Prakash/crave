@@ -71,9 +71,9 @@ function MyRecipes() {
           paginatedRecipes?.map((recipe) => (
             <RecipeCard
               key={recipe.id}
-              {...recipe} // Spread all recipe properties
-              onDelete={handleRefreshRecipes} // Pass refresh function for delete
-              onUpdate={handleRefreshRecipes} // Pass refresh function for update
+              {...recipe}
+              onDelete={handleRefreshRecipes} 
+              onUpdate={handleRefreshRecipes} 
             />
           ))
         ) : (
