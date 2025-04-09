@@ -3,7 +3,12 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { MdOutlinePushPin } from "react-icons/md";
+import {
+  MdOutlinePushPin,
+  MdClose,
+  MdChevronLeft,
+  MdChevronRight,
+} from "react-icons/md";
 import { recipe } from "@/types/types";
 import CommentComponent from "@/components/Comments";
 
@@ -11,31 +16,52 @@ function RecipeDetailPage() {
   const { id } = useParams();
   const router = useRouter();
   const [recipe, setRecipe] = useState<recipe>();
+  const [images, setImages] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(
+    null
+  );
 
   useEffect(() => {
-    const fetchRecipe = async () => {
+    const fetchRecipeAndImages = async () => {
       try {
-        const response = await axios.post(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}recipes/get-recipe-by-id`,
-          { id },
-          { withCredentials: true }
-        );
-        if (response.status !== 200) {
-          throw new Error("Error fetching recipe");
+        const [recipeRes, imageRes] = await Promise.all([
+          axios.post(
+            `${process.env.NEXT_PUBLIC_BACKEND_URL}recipes/get-recipe-by-id`,
+            { id },
+            { withCredentials: true }
+          ),
+          axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}images/${id}`, {
+            withCredentials: true,
+          }),
+        ]);
+
+        if (recipeRes.status === 200) {
+          setRecipe(recipeRes.data[0]);
+        } else {
+          throw new Error("Recipe fetch failed");
         }
-        setRecipe(response.data[0]);
-      } catch (error) {
-        console.error(error);
-        setError("Failed to fetch recipe. Please try again later.");
-        toast.error("Failed to fetch recipe");
+
+        if (imageRes.status === 200) {
+          const urls = imageRes.data.images.map(
+            (img: any) =>
+              `${process.env.NEXT_PUBLIC_BACKEND_URL?.replace(/\/$/, "")}${
+                img.image_url
+              }`
+          );
+          setImages(urls);
+        }
+      } catch (err) {
+        console.error(err);
+        setError("Failed to load recipe or images.");
+        toast.error("Failed to load data.");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchRecipe();
+    fetchRecipeAndImages();
   }, [id]);
 
   const handlePinClick = () => {
@@ -47,6 +73,28 @@ function RecipeDetailPage() {
     router.back();
   };
 
+  const openImageModal = (index: number) => {
+    setSelectedImageIndex(index);
+    document.body.style.overflow = "hidden"; // Prevent scrolling when modal is open
+  };
+
+  const closeImageModal = () => {
+    setSelectedImageIndex(null);
+    document.body.style.overflow = "auto"; // Re-enable scrolling
+  };
+
+  const navigateImage = (direction: "prev" | "next") => {
+    if (selectedImageIndex === null) return;
+
+    if (direction === "prev") {
+      setSelectedImageIndex((prev) =>
+        prev === 0 ? images.length - 1 : (prev || 0) - 1
+      );
+    } else {
+      setSelectedImageIndex((prev) => ((prev || 0) + 1) % images.length);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex justify-center items-center bg-gradient-to-br from-orange-100 to-yellow-100">
@@ -55,7 +103,6 @@ function RecipeDetailPage() {
     );
   }
 
-  // Error state
   if (error) {
     return (
       <div className="min-h-screen flex justify-center items-center bg-gradient-to-br from-orange-100 to-yellow-100">
@@ -86,6 +133,26 @@ function RecipeDetailPage() {
           dangerouslySetInnerHTML={{ __html: recipe?.description || "" }}
         ></div>
 
+        {/* Recipe Images */}
+        {images.length > 0 && (
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
+            {images.map((url, index) => (
+              <div
+                key={index}
+                className="relative group cursor-pointer"
+                onClick={() => openImageModal(index)}
+              >
+                <img
+                  src={url}
+                  alt={`Recipe image ${index + 1}`}
+                  className="w-full h-60 object-cover rounded-xl shadow transition-transform group-hover:scale-105 z-50"
+                />
+                
+              </div>
+            ))}
+          </div>
+        )}
+
         {/* Back Button */}
         <button
           onClick={handleBack}
@@ -95,7 +162,45 @@ function RecipeDetailPage() {
         </button>
       </div>
 
-      <CommentComponent  recipeId={Number(id)}/>
+      {/* Image Modal */}
+      {selectedImageIndex !== null && (
+        <div className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4">
+          <button
+            onClick={closeImageModal}
+            className="absolute top-4 right-4 text-white text-4xl hover:text-orange-400 transition-colors z-50"
+          >
+            <MdClose size={40} />
+          </button>
+
+          <button
+            onClick={() => navigateImage("prev")}
+            className="absolute left-4 text-white text-4xl hover:text-orange-400 transition-colors z-50"
+          >
+            <MdChevronLeft size={50} />
+          </button>
+
+          <div className="relative w-full h-full flex items-center justify-center">
+            <img
+              src={images[selectedImageIndex]}
+              alt={`Recipe image ${selectedImageIndex + 1}`}
+              className="max-w-full max-h-full object-contain"
+            />
+          </div>
+
+          <button
+            onClick={() => navigateImage("next")}
+            className="absolute right-4 text-white text-4xl hover:text-orange-400 transition-colors z-50"
+          >
+            <MdChevronRight size={50} />
+          </button>
+
+          <div className="absolute bottom-4 text-white text-lg z-50">
+            {selectedImageIndex + 1} / {images.length}
+          </div>
+        </div>
+      )}
+
+      <CommentComponent recipeId={Number(id)} />
     </div>
   );
 }

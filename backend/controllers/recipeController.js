@@ -82,33 +82,38 @@ const getUserRecipes = async (req, res) => {
   }
 };
 
+
 const deleteRecipe = async (req, res) => {
   try {
-    const { id: recipeId } = req.params;
+    const { id: recipe_id } = req.params;
     const connection = await connectDB();
 
-    const [recipe] = await connection.execute(
-      "SELECT * FROM recipes WHERE id = ?",
-      [recipeId]
+    // Get associated image URLs
+    const [images] = await connection.execute(
+      "SELECT image_url FROM images WHERE recipe_id = ?",
+      [recipe_id]
     );
 
-    if (recipe.length === 0) {
-      return res.status(404).json({ message: "Recipe not found" });
-    }
+    // Delete recipe
+    await connection.execute("DELETE FROM recipes WHERE id = ?", [recipe_id]);
 
-    await connection.execute("DELETE FROM recipes WHERE id = ?", [recipeId]);
+    // Delete associated images from DB
+    await connection.execute("DELETE FROM images WHERE recipe_id = ?", [recipe_id]);
 
-    await connection.execute("DELETE FROM favorites WHERE recipe_id = ?", [
-      recipeId,
-    ]);
+    // Delete image files from filesystem
+    images.forEach(image => {
+      const filePath = path.join(process.cwd(), "uploads", path.basename(image.image_url));
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+    });
 
-    return res.status(200).json({ message: "Recipe deleted successfully" });
+    res.status(200).json({ success: true, message: "Recipe deleted successfully." });
   } catch (error) {
     console.error("Error deleting recipe:", error);
-    return res.status(500).json({ message: "Internal Server Error" });
+    res.status(500).json({ success: false, message: "Internal server error." });
   }
 };
-
 export {
   getRecipes,
   getRecipeById,

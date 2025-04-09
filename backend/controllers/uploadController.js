@@ -33,12 +33,26 @@ const imgUpload = async (req, res) => {
     }
 
     if (!recipe_id) {
+      // Delete the uploaded file if no recipe_id was provided
+      fs.unlinkSync(path.join(process.cwd(), "uploads", file.filename));
       return res.status(400).json({ message: "Recipe ID is required" });
     }
 
-    const imageUrl = `/uploads/${file.filename}`;
+    // Verify the recipe exists
     const connection = await connectDB();
+    const [recipe] = await connection.execute(
+      "SELECT id FROM recipes WHERE id = ?",
+      [recipe_id]
+    );
 
+    if (recipe.length === 0) {
+      // Delete the uploaded file if recipe doesn't exist
+      fs.unlinkSync(path.join(process.cwd(), "uploads", file.filename));
+      return res.status(404).json({ message: "Recipe not found" });
+    }
+
+    const imageUrl = `/uploads/${file.filename}`;
+    
     await connection.execute(
       "INSERT INTO images (recipe_id, image_url) VALUES (?, ?)",
       [recipe_id, imageUrl]
@@ -47,6 +61,10 @@ const imgUpload = async (req, res) => {
     return res.status(200).json({ message: "File uploaded successfully", imageUrl });
   } catch (error) {
     console.log("Error in uploading image:", error);
+    // Delete the uploaded file if an error occurred
+    if (req.file) {
+      fs.unlinkSync(path.join(process.cwd(), "uploads", req.file.filename));
+    }
     return res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -73,7 +91,7 @@ const deleteImage = async (req, res) => {
 
     const imageUrl = rows[0].image_url;
     const filePath = path.join(process.cwd(), "uploads", path.basename(imageUrl));
-    
+
     // Delete file from the filesystem
     fs.unlink(filePath, async (err) => {
       if (err) {
@@ -92,4 +110,25 @@ const deleteImage = async (req, res) => {
   }
 };
 
-export { upload, imgUpload, deleteImage };
+const getImagesByRecipeId = async (req, res) => {
+  const { recipe_id } = req.params;
+
+  if (!recipe_id) {
+    return res.status(400).json({ message: "Recipe ID is required" });
+  }
+
+  try {
+    const connection = await connectDB();
+    const [images] = await connection.execute(
+      "SELECT id, image_url FROM images WHERE recipe_id = ?",
+      [recipe_id]
+    );
+
+    return res.status(200).json({ images });
+  } catch (error) {
+    console.error("Error fetching images by recipe ID:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export { upload, imgUpload, deleteImage, getImagesByRecipeId };
