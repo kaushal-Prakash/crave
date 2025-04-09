@@ -16,7 +16,7 @@ export const createRecipe = async (title, description, user_id) => {
 export const getAllRecipes = async () => {
   try {
     const connection = await connectDB();
-    const [rows] = await connection.execute("SELECT * FROM recipes");
+    const [rows] = await connection.execute("SELECT * FROM recipes order by id desc");
     return rows;
   } catch (error) {
     throw error;
