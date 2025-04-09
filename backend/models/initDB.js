@@ -41,6 +41,16 @@ const createTables = async () => {
       ) ENGINE=InnoDB;
     `);
 
+    await connection.execute(`
+      CREATE TABLE IF NOT EXISTS images (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        recipe_id INT NOT NULL,
+        image_url VARCHAR(255) NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (recipe_id) REFERENCES recipes(id) ON DELETE CASCADE
+      ) ENGINE=InnoDB;
+    `);
+
     // Create favorites table (many-to-many relationship between users and recipes)
     await connection.execute(`
           CREATE TABLE IF NOT EXISTS favorites (
