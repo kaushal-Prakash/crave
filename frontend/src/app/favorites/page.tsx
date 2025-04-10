@@ -23,10 +23,6 @@ function FavPage() {
 
         if (res.status === 200) {
           setRecipes(res.data.favorites);
-        } else if (res.status === 404) {
-          toast.error(res.data.message);
-        } else {
-          toast.error("Error fetching recipes");
         }
       } catch (error) {
         console.log(error);
