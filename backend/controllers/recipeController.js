@@ -5,7 +5,7 @@ const getRecipes = async (req, res) => {
   try {
     const recipes = await getAllRecipes();
     if (!recipes) {
-      return res.status(404).json({ message: "No recipes found" });
+      return res.status(204).json({ message: "No recipes found" });
     }
 
     return res.status(200).json({ recipes: recipes });
@@ -19,7 +19,7 @@ const getRecipeById = async (req, res) => {
   try {
     const { id } = req.body;
     if (!id) {
-      return res.status(404).json({ message: "Id not found in request!" });
+      return res.status(204).json({ message: "Id not found in request!" });
     }
 
     const connection = await connectDB();
@@ -28,7 +28,7 @@ const getRecipeById = async (req, res) => {
       [id]
     );
     if (!result) {
-      return res.status(404).json({ message: "No recipe found" });
+      return res.status(204).json({ message: "No recipe found" });
     }
 
     return res.status(200).json(result);
@@ -42,7 +42,7 @@ const updateRecipe = async (req, res) => {
   try {
     const { id, title, description } = req.body;
     if (!id || !title || !description) {
-      return res.status(404).json({ message: "Enter all details" });
+      return res.status(204).json({ message: "Enter all details" });
     }
 
     const connection = await connectDB();
@@ -72,7 +72,7 @@ const getUserRecipes = async (req, res) => {
     );
 
     if (result.length === 0) {
-      return res.status(404).json({ message: "No recipes found" });
+      return res.status(204).json({ message: "No recipes found" });
     }
 
     return res.status(200).json({ result });

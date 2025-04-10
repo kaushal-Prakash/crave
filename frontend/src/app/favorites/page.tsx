@@ -21,7 +21,7 @@ function FavPage() {
           { withCredentials: true }
         );
 
-        if (res.status === 200) {
+        if (res.status === 200 || res.status === 204) {
           setRecipes(res.data.favorites);
         }
       } catch (error) {

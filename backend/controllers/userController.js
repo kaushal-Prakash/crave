@@ -54,7 +54,7 @@ const userLogin = async (req, res) => {
     const { username, password } = req.body;
 
     if (!username || !password) {
-      return res.status(404).json({ message: "Fill all credentials" });
+      return res.status(204).json({ message: "Fill all credentials" });
     }
 
     const userExists = await getUserByUsername(username);
@@ -92,7 +92,7 @@ const getUserById = async (req, res) => {
     );
 
     if (result.length === 0) {
-      return res.status(404).json({ message: "No user Found" });
+      return res.status(204).json({ message: "No user Found" });
     }
 
     return res.status(200).json({ result });
@@ -116,7 +116,7 @@ const isLogedIn = async (req, res) => {
   try {
     const userId = req.user;
     if (!userId) {
-      return res.status(404).json({ message: "No token found" });
+      return res.status(204).json({ message: "No token found" });
     }
     return res.status(200).json({ message: "User is genuine" });
   } catch (error) {
@@ -188,7 +188,7 @@ const addToFavorite = async (req, res) => {
     );
 
     if (recipe.length === 0) {
-      return res.status(404).json({ message: "Recipe not found" });
+      return res.status(204).json({ message: "Recipe not found" });
     }
 
     const [favorite] = await connection.execute(
@@ -229,7 +229,7 @@ const getUserFav = async (req, res) => {
     );
 
     if (result.length === 0) {
-      return res.status(404).json({ message: "No favorite recipe found" });
+      return res.status(204).json({ message: "No favorite recipe found" });
     }
 
     return res.status(200).json({ favorites: result });

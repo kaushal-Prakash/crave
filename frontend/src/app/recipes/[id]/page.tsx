@@ -65,9 +65,23 @@ function RecipeDetailPage() {
     fetchRecipeAndImages();
   }, [id]);
 
-  const handlePinClick = () => {
-    console.log("Recipe pinned!");
-    toast.success("Recipe pinned!");
+  const handlePinClick = async () => {
+    try {
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}users/add-to-fav/${id}`,
+        { withCredentials: true }
+      );
+
+      if (res.status === 200) {
+        toast.success(res.data.message);
+      } else {
+        toast.error("Failed to add recipe to favorites");
+      }
+    } catch (error) {
+      console.log("Error adding favorites: ", error);
+      toast.error("Internal server error! Please try again.");
+    } finally {
+    }
   };
 
   const handleBack = () => {
