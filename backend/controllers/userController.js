@@ -22,7 +22,50 @@ const userSignup = async (req, res) => {
   if (!username || !email || !password || !fullName) {
     return res.status(400).json({ message: "All fields are required" });
   }
+  //  bcrypt is based on the Blowfish cipher and uses a salt to protect against rainbow table attacks.
+  // bcrypt algorithm = EksBlowfish + Key expansion loops + Salt + Cost factor
+  // Step 1: Generate a Salt
 
+  // bcrypt first generates a 16-byte random salt (base64-encoded → 22 characters in output).
+  // Step 2: Key Expansion with EksBlowfish
+
+  // bcrypt combines your password + salt to initialize the EksBlowfish key schedule.
+
+  // This process is intentionally computationally expensive — that’s the “work factor” you set (10 in your code).
+
+  // Internally:
+
+  // Password and salt are repeatedly mixed and expanded through Blowfish’s key setup routine.
+
+  // The number of iterations = 2^cost.
+
+  // For cost = 10 → 1024 iterations.
+
+  // For cost = 12 → 4096 iterations.
+
+  // This scaling makes bcrypt future-proof — you can increase cost as CPUs get faster.
+
+  // Step 3: Encrypt a Constant String
+
+  // After key setup, bcrypt takes a constant input string:
+
+  // "OrpheanBeholderScryDoubt"
+
+  // It runs this string through the Blowfish encryption function 64 times using the derived key.
+
+  // This acts like a final mixing stage that produces a deterministic but one-way result.
+
+  // 🔹 Step 4: Output Formatting
+
+  // bcrypt outputs a string containing:
+
+  // Algorithm version
+
+  // Cost factor
+
+  // Salt
+
+  // Hashed result
   const hashedPassword = await bcrypt.hash(password, 10);
 
   try {
@@ -32,6 +75,13 @@ const userSignup = async (req, res) => {
     }
 
     const userId = await createUser(fullName, username, email, hashedPassword);
+
+    //     JWT stands for JSON Web Token.
+    // It’s an open standard (RFC 7519) used to securely transmit information between a client and server as a compact, digitally signed token.
+
+    // So instead of storing session data on the server, JWT lets you store user identity data inside the token itself, which the client carries (usually in a cookie or Authorization header).
+
+    // 3 parts hai -> payload(is encoded not encrypted so dont store sensitive info), header(tells which algo was used eg hs256), signature(to known if it was tampered)
 
     const token = jwt.sign({ userId, username }, process.env.JWT_SECRET, {
       expiresIn: "7d",
