@@ -9,8 +9,8 @@ const connectDB = async () => {
       user: process.env.MYSQL_USERNAME,
       password: process.env.MYSQL_PASS,
       database: process.env.MYSQL_DB,
-      waitForConnections:true,
-      connectionLimit:10,
+      waitForConnections:true, //if no connections are available, wait in connection queue instead of throwing error
+      connectionLimit:10, //no of connections that can be created at a time by backend
     });
     console.log('😁 MySQL DB connected!');
     return connection;
