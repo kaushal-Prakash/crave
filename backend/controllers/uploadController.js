@@ -4,6 +4,11 @@ import path from "path";
 import fs from "fs";
 
 // Multer config
+//Multer is a Node.js middleware for handling multipart/form-data, which is the encoding used when uploading files through HTML forms.
+// It works with Express.js and saves uploaded files either:
+// to disk (your local filesystem)
+
+// Multipart is a way of sending different types of data (like text + files) in a single HTTP request — most commonly used with the content type:  multipart/form-data
 const storage = multer.diskStorage({
   destination: "./uploads",
   filename: (req, file, cb) => {
@@ -52,13 +57,15 @@ const imgUpload = async (req, res) => {
     }
 
     const imageUrl = `/uploads/${file.filename}`;
-    
+
     await connection.execute(
       "INSERT INTO images (recipe_id, image_url) VALUES (?, ?)",
       [recipe_id, imageUrl]
     );
 
-    return res.status(200).json({ message: "File uploaded successfully", imageUrl });
+    return res
+      .status(200)
+      .json({ message: "File uploaded successfully", imageUrl });
   } catch (error) {
     console.log("Error in uploading image:", error);
     // Delete the uploaded file if an error occurred
@@ -90,13 +97,19 @@ const deleteImage = async (req, res) => {
     }
 
     const imageUrl = rows[0].image_url;
-    const filePath = path.join(process.cwd(), "uploads", path.basename(imageUrl));
+    const filePath = path.join(
+      process.cwd(),
+      "uploads",
+      path.basename(imageUrl)
+    );
 
     // Delete file from the filesystem
     fs.unlink(filePath, async (err) => {
       if (err) {
         console.error("Error deleting file:", err);
-        return res.status(500).json({ message: "Failed to delete image! try again" });
+        return res
+          .status(500)
+          .json({ message: "Failed to delete image! try again" });
       }
 
       // Delete from DB
@@ -123,7 +136,10 @@ const getImagesByRecipeId = async (req, res) => {
       "SELECT id, image_url FROM images WHERE recipe_id = ?",
       [recipe_id]
     );
+    // It takes your JavaScript object ({ images: [...] }).
+    // It calls JSON.stringify() internally.
 
+    // It sends it as a JSON response with header:
     return res.status(200).json({ images });
   } catch (error) {
     console.error("Error fetching images by recipe ID:", error);
