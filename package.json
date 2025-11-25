@@ -7,7 +7,7 @@
     "test": "tests"
   },
   "scripts": {
-    "test": "npx testcafe chrome tests/login.test.js"
+    "test": "npx testcafe chrome tests"
   },
   "repository": {
     "type": "git",
