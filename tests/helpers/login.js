@@ -1,27 +1,30 @@
-import { Selector, t } from "testcafe";
+// tests/helpers/login.js
+import { Selector } from "testcafe";
 
-export async function login() {
+export async function login(t) {
+    console.log("---- CLEARING COOKIES ----");
 
-    // Clear cookies before every login
-    await t.eval(() => {
-        document.cookie.split(";").forEach(c => {
-            document.cookie = c
-              .replace(/^ +/, "")
-              .replace(/=.*/, `=;expires=${new Date(0).toUTCString()};path=/`);
-        });
-    });
+    await t.deleteCookies();
 
     const usernameInput = Selector('input[placeholder="Enter your email"]');
     const passwordInput = Selector('input[placeholder="Enter your password"]');
-    const loginButton   = Selector("button").withText("Login");
+    const loginButton   = Selector('button').withText('Login');
 
-    await t
-        .typeText(usernameInput, "jay", { replace: true })
-        .typeText(passwordInput, "123", { replace: true })
-        .click(loginButton)
-        .wait(1500);
+    await t.click(usernameInput);
+    await t.pressKey("ctrl+a delete");
+    await t.typeText(usernameInput, "jay", { paste: true });
 
-    await t
-        .expect(t.eval(() => window.location.pathname))
-        .eql("/home");
+    await t.click(passwordInput);
+    await t.pressKey("ctrl+a delete");
+    await t.typeText(passwordInput, "123", { paste: true });
+
+    await t.click(loginButton).wait(2000);
+
+    const cookies = await t.getCookies();
+    console.log("COOKIES AFTER LOGIN:", cookies);
+
+    const url = await t.eval(() => window.location.href);
+    console.log("URL AFTER LOGIN:", url);
+
+    await t.expect(t.eval(() => window.location.pathname)).eql("/home");
 }
