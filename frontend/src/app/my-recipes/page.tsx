@@ -55,7 +55,7 @@ function MyRecipes() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-200 to-yellow-200 p-8">
+    <div data-testid="recipe-card" className="min-h-screen bg-gradient-to-br from-orange-200 to-yellow-200 p-8">
       <div className="max-w-md mx-auto mb-6 pt-20">
         <input
           type="text"
