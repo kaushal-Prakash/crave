@@ -7,7 +7,7 @@ fixture`Favorite Recipes Tests`
 
 test("Favorite Recipes page loads and displays favorite recipes", async t => {
     // Step 1: login
-    await login();
+    await login(t);
 
     // Step 2: Go to favorites page
     await t.navigateTo(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/favorites`);

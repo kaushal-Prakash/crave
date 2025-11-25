@@ -8,7 +8,7 @@ fixture`My Recipes Page Tests`.page(
 
 test("My Recipes page loads and displays recipes", async (t) => {
   // Step 1: login
-  await login();
+  await login(t);
 
   // Step 2: Go to my-recipes page
   await t.navigateTo(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/my-recipes`);
