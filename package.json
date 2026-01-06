@@ -7,7 +7,8 @@
     "test": "tests"
   },
   "scripts": {
-    "test": "npx testcafe chrome tests"
+    "test": "npx testcafe chrome tests",
+    "dev:ai": "fastapi dev ./recommender/main.py"
   },
   "repository": {
     "type": "git",
