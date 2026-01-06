@@ -20,6 +20,13 @@
 /.next/
 /out/
 
+#python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+
 # production
 /build
 
