@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/kaushal-Prakash/crave#readme",
   "devDependencies": {
+    "concurrently": "^9.2.1",
     "dotenv": "^17.2.3",
     "testcafe": "^3.7.2"
   }
