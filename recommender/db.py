@@ -1,6 +1,7 @@
 import mysql.connector
 import os
 from dotenv import load_dotenv
+from text_cleaner import clean_html
 
 load_dotenv()
 
@@ -30,7 +31,7 @@ def load_recipes():
         comments = cursor.fetchall()
 
         # Combine all text into one AI feature blob i.e a single string representing all relevant text data for the recipe
-        r["features"] = (
+        r["features"] = clean_html(
             r["title"] + " " +
             r["description"] + " " +
             " ".join([c["content"] for c in comments])

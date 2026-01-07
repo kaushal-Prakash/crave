@@ -1,3 +1,4 @@
 "fastapi[standard-no-fastapi-cloud-cli]"
 scikit-learn
 mysql-connector-python
+beautifulsoup4
