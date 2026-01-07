@@ -12,6 +12,7 @@ import {
 } from "react-icons/md";
 import { recipe } from "@/types/types";
 import CommentComponent from "@/components/Comments";
+import Recommended from "@/components/Recommeded";
 
 function RecipeDetailPage() {
   const { id } = useParams();
@@ -23,8 +24,15 @@ function RecipeDetailPage() {
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(
     null
   );
+  const [currentUserId, setCurrentUserId] = useState<number | null>(null);
 
   useEffect(() => {
+    // Get current user ID from localStorage
+    const storedUserId = localStorage.getItem("currentUserId");
+    if (storedUserId) {
+      setCurrentUserId(Number(storedUserId));
+    }
+
     const fetchRecipeAndImages = async () => {
       try {
         const [recipeRes, imageRes] = await Promise.all([
@@ -127,54 +135,75 @@ function RecipeDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-100 to-yellow-100 p-6">
-      <div className="mt-16 mx-auto bg-white rounded-xl shadow-2xl p-6 md:p-12 border-2 border-orange-200 relative">
-        {/* Pin Button */}
-        <button
-          onClick={handlePinClick}
-          className="absolute right-8 top-8 text-green-800 cursor-pointer hover:text-orange-800 transition-colors"
-        >
-          <MdOutlinePushPin size={30} />
-        </button>
+    <div className="min-h-screen bg-gradient-to-br from-orange-100 to-yellow-100 p-4 md:p-6">
+      <div className="mt-16 mx-auto max-w-7xl">
+        {/* Main Recipe Content */}
+        <div className="bg-white rounded-xl shadow-2xl p-6 md:p-12 border-2 border-orange-200 relative mb-8">
+          {/* Pin Button */}
+          <button
+            onClick={handlePinClick}
+            className="absolute right-8 top-8 text-green-800 cursor-pointer hover:text-orange-800 transition-colors"
+          >
+            <MdOutlinePushPin size={30} />
+          </button>
 
-        {/* Recipe Title */}
-        <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r bg-clip-text text-transparent from-orange-600 to-yellow-700 mb-6">
-          {recipe?.title}
-        </h1>
+          {/* Recipe Title */}
+          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r bg-clip-text text-transparent from-orange-600 to-yellow-700 mb-6">
+            {recipe?.title}
+          </h1>
 
-        {/* Recipe Description */}
-        <div
-          className="text-lg text-gray-700 mb-8 quill-content"
-          dangerouslySetInnerHTML={{ __html: recipe?.description || "" }}
-        ></div>
+          {/* Recipe Description */}
+          <div
+            className="text-lg text-gray-700 mb-8 quill-content"
+            dangerouslySetInnerHTML={{ __html: recipe?.description || "" }}
+          ></div>
 
-        {/* Recipe Images */}
-        {images.length > 0 && (
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
-            {images.map((url, index) => (
-              <div
-                key={index}
-                className="relative group cursor-pointer"
-                onClick={() => openImageModal(index)}
-              >
-                <img
-                  src={url}
-                  alt={`Recipe image ${index + 1}`}
-                  className="w-full h-60 object-cover rounded-xl shadow transition-transform group-hover:scale-105 z-50"
-                />
-                
-              </div>
-            ))}
+          {/* Recipe Images */}
+          {images.length > 0 && (
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
+              {images.map((url, index) => (
+                <div
+                  key={index}
+                  className="relative group cursor-pointer"
+                  onClick={() => openImageModal(index)}
+                >
+                  <img
+                    src={url}
+                    alt={`Recipe image ${index + 1}`}
+                    className="w-full h-60 object-cover rounded-xl shadow transition-transform group-hover:scale-105 z-50"
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Back Button */}
+          <button
+            onClick={handleBack}
+            className="bg-gradient-to-r from-orange-400 to-yellow-500 text-white px-6 py-2 rounded-lg hover:from-orange-500 hover:to-yellow-600 transition-all duration-300 font-semibold shadow-md cursor-pointer"
+          >
+            Back to Last Page
+          </button>
+        </div>
+
+        {/* Comments Section */}
+        <div className="mb-8">
+          <CommentComponent recipeId={Number(id)} />
+        </div>
+
+        {/* Recommended Recipes Section - ADDED HERE */}
+        <div className="mb-8">
+          <div className="bg-white rounded-xl shadow-2xl p-6 md:p-8 border-2 border-orange-200">
+            <h2 className="text-3xl font-bold text-gray-800 mb-6 pb-3 border-b-2 border-orange-200">
+              More Recipes You Might Like
+            </h2>
+            {currentUserId ? (
+              <Recommended userId={currentUserId} />
+            ) : (
+              <></>
+            )}
           </div>
-        )}
-
-        {/* Back Button */}
-        <button
-          onClick={handleBack}
-          className="bg-gradient-to-r from-orange-400 to-yellow-500 text-white px-6 py-2 rounded-lg hover:from-orange-500 hover:to-yellow-600 transition-all duration-300 font-semibold shadow-md cursor-pointer"
-        >
-          Back to Last Page
-        </button>
+        </div>
       </div>
 
       {/* Image Modal */}
@@ -214,8 +243,6 @@ function RecipeDetailPage() {
           </div>
         </div>
       )}
-
-      <CommentComponent recipeId={Number(id)} />
     </div>
   );
 }
