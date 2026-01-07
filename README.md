@@ -34,25 +34,27 @@ With the introduction of **AI-based personalized recommendations**, Crave now in
 
 ### 🔐 Core Features
 
-* Secure authentication using **JWT & HTTP-only cookies**
-* Upload, edit, delete recipes
-* Browse community recipes
-* Comment & interact
+- Secure authentication using **JWT & HTTP-only cookies**
+- Upload, edit, delete recipes
+- Browse community recipes
+- Comment & interact
 
 ### 🧠 AI Features (v1.2.0)
 
-* **Content-Based Recipe Recommendation Engine**
-* “Because you liked this…” suggestions
-* Smart similarity detection using:
+- **Content-Based Recipe Recommendation Engine**
+- “Because you liked this…” suggestions
+- Smart similarity detection using:
 
-  * TF-IDF Vectorization
-  * Cosine Similarity Ranking
-* Learns from:
+  - TF-IDF Vectorization
+  - Cosine Similarity Ranking
 
-  * Recipe titles
-  * Descriptions
-  * User comments
-* Real-time AI microservice powered by **FastAPI**
+- Learns from:
+
+  - Recipe titles
+  - Descriptions
+  - User comments
+
+- Real-time AI microservice powered by **FastAPI**
 
 ---
 
@@ -60,23 +62,23 @@ With the introduction of **AI-based personalized recommendations**, Crave now in
 
 ### Frontend
 
-* **Next.js**
-* **Axios**
-* **Sass**
+- **Next.js**
+- **Axios**
+- **Sass**
 
 ### Backend
 
-* **Node.js + Express**
-* **MySQL**
-* **JWT Authentication**
+- **Node.js + Express**
+- **MySQL**
+- **JWT Authentication**
 
 ### AI Microservice
 
-* **FastAPI**
-* **scikit-learn**
-* **TF-IDF NLP Engine**
-* **Cosine Similarity Ranking**
-* **BeautifulSoup (HTML cleaning)**
+- **FastAPI**
+- **scikit-learn**
+- **TF-IDF NLP Engine**
+- **Cosine Similarity Ranking**
+- **BeautifulSoup (HTML cleaning)**
 
 ---
 
@@ -131,9 +133,9 @@ npm run dev
 
 Runs:
 
-* Frontend
-* Backend
-* AI Recommendation Engine
+- Frontend
+- Backend
+- AI Recommendation Engine
 
 ---
 
@@ -149,37 +151,37 @@ Runs:
 
 ### Authentication
 
-* `POST /users/user-signup`
-* `POST /users/user-login`
-* `GET /users/user-logout`
-* `GET /users/is-loged-in`
-* `GET /users/get-user`
-* `GET /users/get-user-by-id`
+- `POST /users/user-signup`
+- `POST /users/user-login`
+- `GET /users/user-logout`
+- `GET /users/is-loged-in`
+- `GET /users/get-user`
+- `GET /users/get-user-by-id`
 
 ### Recipes
 
-* `POST /users/add-recipe`
-* `POST /recipes/update-recipe`
-* `POST /recipes/get-recipe-by-id`
-* `GET /recipes/get-recipes`
-* `GET /recipes/get-user-recipes`
-* `GET /recipes/delete-recipe/:id`
+- `POST /users/add-recipe`
+- `POST /recipes/update-recipe`
+- `POST /recipes/get-recipe-by-id`
+- `GET /recipes/get-recipes`
+- `GET /recipes/get-user-recipes`
+- `GET /recipes/delete-recipe/:id`
 
 ### Comments
 
-* `POST /comments/add/:id`
-* `POST /comments/update/:id`
-* `GET /comments/get-recipe-comments/:id`
-* `GET /comments/delete/:id`
+- `POST /comments/add/:id`
+- `POST /comments/update/:id`
+- `GET /comments/get-recipe-comments/:id`
+- `GET /comments/delete/:id`
 
 ---
 
 ## 🌟 Why Crave v1.2.0 is Special
 
-* AI-powered personalization
-* Industry-grade microservice architecture
-* Resume-worthy full-stack + AI project
-* Scalable and production-ready
+- AI-powered personalization
+- Industry-grade microservice architecture
+- Resume-worthy full-stack + AI project
+- Scalable and production-ready
 
 ---
 
