@@ -8,7 +8,7 @@
   },
   "scripts": {
     "test": "npx testcafe chrome tests",
-    "dev:ai": "fastapi dev ./recommender/main.py",
+    "dev:ai": "cd recommender && python -m uvicorn main:app --reload --log-level warning",
     "dev:frontend": "npm --prefix frontend run dev",
     "dev:backend": "npm --prefix backend run dev",
     "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\" \"npm run dev:ai\""
