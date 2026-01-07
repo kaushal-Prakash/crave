@@ -1,77 +1,186 @@
-# Crave - Recipe Sharing Platform
+<h1 align="center">🍽️ Crave – Recipe Sharing Platform</h1>
 
-## Overview
-Crave is a user-friendly platform designed for food enthusiasts to share and discover new recipes. Users can sign up, upload their favorite dishes, browse community recipes, and engage with others through comments.
+<h3 align="center">Version 1.2.0 – Now with AI Recommendations</h3>
 
-## Features
-- **User Authentication**: Secure login and signup using JWT and HTTP-only cookies.
-- **Recipe Management**: Users can add, edit, and delete their own recipes.
-- **Browsing & Discovery**: Explore recipes shared by other users.
-- **Comments Section**: Engage with the community by commenting on recipes.
+---
 
-## Tech Stack
-### Frontend:
-- **Next.js** – Modern React framework for UI development.
-- **Axios** – Simplifies API requests.
-- **Sass** – Enhances styling capabilities.
+## 🚀 Overview
 
-### Backend:
-- **Express.js** – Handles REST API requests.
-- **MySQL** – Stores user and recipe data efficiently.
-- **JWT & HTTP-only Cookies** – Ensures secure authentication.
+**Crave** is a modern, AI-powered recipe sharing platform where food lovers can upload, explore, and discover recipes tailored to their taste.
+With the introduction of **AI-based personalized recommendations**, Crave now intelligently suggests recipes similar to what users love — just like Netflix for food.
 
-## Installation & Setup
-1. **Clone the repository**
-   ```sh
-   git clone https://github.com/your-repo/crave.git
-   cd crave
-   ```
-2. **Install dependencies**
-   ```sh
-   # Frontend
-   cd frontend
-   npm install
-   ```
-   ```sh
-   # Backend
-   cd backend
-   npm install
-   ```
-3. **Configure environment variables**
-   - Set up `.env` files for both frontend and backend.
-4. **Run the application**
-   ```sh
-   # Start backend
-   npm run dev
-   ```
-   ```sh
-   # Start frontend
-   npm run dev
-   ```
+---
 
-## API Endpoints
+## Application Preview
+
+<div align="center">
+
+<img src="pics/landing.png" width="80%" />
+<br/><br/>
+
+<img src="pics/home.png" width="80%" />
+<br/><br/>
+
+<img src="pics/add.png" width="80%" />
+<br/><br/>
+
+<img src="pics/recommend.png" width="80%" />
+
+</div>
+
+---
+
+## ✨ Features
+
+### 🔐 Core Features
+
+* Secure authentication using **JWT & HTTP-only cookies**
+* Upload, edit, delete recipes
+* Browse community recipes
+* Comment & interact
+
+### 🧠 AI Features (v1.2.0)
+
+* **Content-Based Recipe Recommendation Engine**
+* “Because you liked this…” suggestions
+* Smart similarity detection using:
+
+  * TF-IDF Vectorization
+  * Cosine Similarity Ranking
+* Learns from:
+
+  * Recipe titles
+  * Descriptions
+  * User comments
+* Real-time AI microservice powered by **FastAPI**
+
+---
+
+## 🧩 Tech Stack
+
+### Frontend
+
+* **Next.js**
+* **Axios**
+* **Sass**
+
+### Backend
+
+* **Node.js + Express**
+* **MySQL**
+* **JWT Authentication**
+
+### AI Microservice
+
+* **FastAPI**
+* **scikit-learn**
+* **TF-IDF NLP Engine**
+* **Cosine Similarity Ranking**
+* **BeautifulSoup (HTML cleaning)**
+
+---
+
+## 🏗 Architecture
+
+```
+Crave/
+ ├── frontend/        → Next.js UI
+ ├── backend/         → Express API
+ └── recommender/     → AI Recommendation Microservice
+```
+
+---
+
+## 🛠 Installation
+
+### Clone
+
+```bash
+git clone https://github.com/your-repo/crave.git
+cd crave
+```
+
+### Frontend
+
+```bash
+cd frontend
+npm install
+```
+
+### Backend
+
+```bash
+cd backend
+npm install
+```
+
+### AI Recommender
+
+```bash
+cd recommender
+pip install -r requirements.txt
+```
+
+---
+
+## ▶️ Run Full Stack
+
+```bash
+npm run dev
+```
+
+Runs:
+
+* Frontend
+* Backend
+* AI Recommendation Engine
+
+---
+
+## 🤖 AI Recommendation API
+
+| Endpoint                   | Description                    |
+| -------------------------- | ------------------------------ |
+| `GET /recommend/:recipeId` | Returns AI-recommended recipes |
+
+---
+
+## 📡 REST API
+
 ### Authentication
-- `POST /users/user-signup` - User registration
-- `POST /users/user-login` - User login
-- `GET /users/user-logout` - User logout
-- `GET /users/is-loged-in` - Check if user is logged in
-- `GET /users/get-user` - Get current user details
-- `GET /users/get-user-by-id` - Get user details by ID
+
+* `POST /users/user-signup`
+* `POST /users/user-login`
+* `GET /users/user-logout`
+* `GET /users/is-loged-in`
+* `GET /users/get-user`
+* `GET /users/get-user-by-id`
 
 ### Recipes
-- `POST /users/add-recipe` - Add a new recipe
-- `POST /recipes/update-recipe` - Edit a recipe
-- `POST /recipes/get-recipe-by-id` - Get a recipe by ID
-- `GET /recipes/get-recipes` - Fetch all recipes
-- `GET /recipes/get-user-recipes` - Fetch all recipes by a user
-- `GET /recipes/delete-recipe/:id` - Delete a recipe
+
+* `POST /users/add-recipe`
+* `POST /recipes/update-recipe`
+* `POST /recipes/get-recipe-by-id`
+* `GET /recipes/get-recipes`
+* `GET /recipes/get-user-recipes`
+* `GET /recipes/delete-recipe/:id`
 
 ### Comments
-- `POST /comments/add/:id` - Add a comment to a recipe
-- `POST /comments/update/:id` - Edit a comment
-- `GET /comments/get-recipe-comments/:id` - Fetch comments for a recipe
-- `GET /comments/delete/:id` - Delete a comment
 
-## License
-This project is open-source and free to use.
+* `POST /comments/add/:id`
+* `POST /comments/update/:id`
+* `GET /comments/get-recipe-comments/:id`
+* `GET /comments/delete/:id`
 
+---
+
+## 🌟 Why Crave v1.2.0 is Special
+
+* AI-powered personalization
+* Industry-grade microservice architecture
+* Resume-worthy full-stack + AI project
+* Scalable and production-ready
+
+---
+
+If you want, next I can help you write a **killer GitHub description & resume bullets** for Crave 👑
