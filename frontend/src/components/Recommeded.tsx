@@ -41,8 +41,8 @@ function Recommended({ userId }: RecommendedProps) {
         }
       );
 
-      if (response.status === 200 && response.data.recommended_recipes) {
-        setRecommendedRecipes(response.data.recommended_recipes);
+      if (response.status === 200 && response.data) {
+        setRecommendedRecipes(response.data);
       } else {
         throw new Error("Invalid response format");
       }
