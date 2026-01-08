@@ -180,9 +180,5 @@ Runs:
 
 - AI-powered personalization
 - Industry-grade microservice architecture
-- Resume-worthy full-stack + AI project
 - Scalable and production-ready
 
----
-
-If you want, next I can help you write a **killer GitHub description & resume bullets** for Crave 👑
