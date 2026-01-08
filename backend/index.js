@@ -39,10 +39,20 @@ app.get("/", (req, res) => {
 });
 
 const port = process.env.PORT || 4000;
-app.listen(port, () => {
-  console.log("🛜 Server running on port:", port);
-});
-
 
 const server = http.createServer(app)
 initSocket(server)   // attach realtime engine
+
+//app.listen() secretly creates its own HTTP server
+//WebSocket is not a separate port — It upgrades the HTTP connection.
+//Socket.IO must hook into the exact same HTTP server that is listening.
+//Golden Rule
+// Only ONE HTTP server can exist per port.
+// Socket.IO must be attached to that one.
+// app.listen(port, () => {
+//   console.log("🛜 Server running on port:", port);
+// });
+
+server.listen(port, () => {
+  console.log("🛜 Server running on port:", port);
+});

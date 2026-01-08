@@ -4,7 +4,7 @@ export function initSocket(server) {
   //Create the WebSocket server on top of your HTTP server
   const io = new Server(server, {
     cors: {
-      origin: "*",
+      origin: "http://localhost:3000",
       methods: ["GET", "POST"],
     },
   });
