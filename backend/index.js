@@ -8,6 +8,8 @@ import commentRoutes from "./routes/commentRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
 import cookieParser from "cookie-parser";
 import authMiddleware from "./middlewares/auth.js";
+import http from "http";
+import { initSocket } from "./websockets/socket.js";
 
 dotenv.config();
 connectDB();
@@ -40,3 +42,7 @@ const port = process.env.PORT || 4000;
 app.listen(port, () => {
   console.log("🛜 Server running on port:", port);
 });
+
+
+const server = http.createServer(app)
+initSocket(server)   // attach realtime engine
