@@ -2,6 +2,7 @@ import { createUser, getUserByEmail } from "../models/User.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import connectDB from "../services/db.js";
+import { use } from "react";
 
 const getUserByUsername = async (username) => {
   try {
@@ -155,7 +156,9 @@ const getUserById = async (req, res) => {
 const currentuser = async (req, res) => {
   try {
     const { userId } = req.user;
-    return res.status(200).json({ userId: userId });
+    return res
+      .status(200)
+      .json({ userId: userId, username: req.username, fullName: req.fullName });
   } catch (error) {
     console.log("Error sending currnt user : ", error);
     return res.status(500).json({ message: "Internal Server Error" });

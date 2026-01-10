@@ -33,7 +33,10 @@ router.get("/recent", authMiddleware, async (req, res) => {
     res.json({
       success: true,
       vegMessages,
-      nonVegMessages
+      nonVegMessages,
+      userId: req.userId,
+      username: req.username,
+      fullName: req.fullName,
     });
   } catch (err) {
     console.error("Recent messages error:", err);
@@ -69,8 +72,11 @@ router.get("/stats", authMiddleware, async (req, res) => {
       success: true,
       stats: {
         veg: veg[0],
-        nonVeg: nonVeg[0]
-      }
+        nonVeg: nonVeg[0],
+      },
+      userId: req.userId,
+      username: req.username,
+      fullName: req.fullName,
     });
   } catch (err) {
     console.error("Stats error:", err);
@@ -117,7 +123,10 @@ router.get("/:group", authMiddleware, async (req, res) => {
       success: true,
       messages,
       total,
-      hasMore: offset + messages.length < total
+      hasMore: offset + messages.length < total,
+      userId: req.userId,
+      username: req.username,
+      fullName: req.fullName,
     });
   } catch (err) {
     console.error("Fetch messages error:", err);
@@ -153,7 +162,15 @@ router.post("/", authMiddleware, async (req, res) => {
       [result.insertId]
     );
 
-    res.status(201).json({ success: true, message: rows[0] });
+    res
+      .status(201)
+      .json({
+        success: true,
+        message: rows[0],
+        userId: req.userId,
+        username: req.username,
+        fullName: req.fullName,
+      });
   } catch (err) {
     console.error("Save message error:", err);
     res.status(500).json({ success: false });
@@ -181,7 +198,7 @@ router.delete("/:id", authMiddleware, async (req, res) => {
     if (rows.length === 0) {
       return res.status(403).json({
         success: false,
-        error: "Not authorized or message not found"
+        error: "Not authorized or message not found",
       });
     }
 
