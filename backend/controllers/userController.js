@@ -2,7 +2,6 @@ import { createUser, getUserByEmail } from "../models/User.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import connectDB from "../services/db.js";
-import { use } from "react";
 
 const getUserByUsername = async (username) => {
   try {
