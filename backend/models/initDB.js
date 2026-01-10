@@ -63,6 +63,21 @@ const createTables = async () => {
           ) ENGINE=InnoDB;
         `);
 
+    // Add messages table for group chats
+    await connection.execute(`
+      CREATE TABLE IF NOT EXISTS messages (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        username VARCHAR(50) NOT NULL,
+        group_type ENUM('veg', 'non-veg') NOT NULL,
+        message TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        INDEX idx_group_type (group_type),
+        INDEX idx_created_at (created_at),
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      ) ENGINE=InnoDB;
+    `);
+
     await connection.execute("SET FOREIGN_KEY_CHECKS=1;"); // Re-enable foreign key checks
 
     console.log("✅ Tables are set up successfully!");
