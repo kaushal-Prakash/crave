@@ -8,6 +8,7 @@ import commentRoutes from "./routes/commentRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
 import cookieParser from "cookie-parser";
 import authMiddleware from "./middlewares/auth.js";
+import messageRoutes from "./routes/messageRoutes.js";
 import http from "http";
 import { initSocket } from "./websockets/socket.js";
 
@@ -29,6 +30,7 @@ app.use(authMiddleware);
 app.use("/users", userRoutes);
 app.use("/recipes", recipeRoutes);
 app.use("/comments", commentRoutes);
+app.use("/messages", messageRoutes);
 app.use("/", uploadRoutes )
 
 // Static folder
