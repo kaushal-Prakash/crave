@@ -1,4 +1,14 @@
 import { Server } from "socket.io";
+import mysql from "mysql2/promise";
+
+const createDbConnection = async () => {
+  return await mysql.createConnection({
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+  });
+};
 
 export function initSocket(server) {
   const io = new Server(server, {
@@ -9,18 +19,16 @@ export function initSocket(server) {
     },
   });
 
-  // Store active users and their rooms
   const activeUsers = new Map();
 
-  io.on("connection", (socket) => {
+  io.on("connection", async (socket) => {
     console.log("User connected:", socket.id);
 
-    // Join a group room (veg or non-veg)
-    socket.on("join_group", ({ group, userId, username }) => {
+    // Join a group room
+    socket.on("join_group", async ({ group, userId, username }) => {
       const roomName = `group_${group}`;
       socket.join(roomName);
       
-      // Store user info
       activeUsers.set(socket.id, { userId, username, group, roomName });
       
       // Notify others in the room
@@ -29,7 +37,7 @@ export function initSocket(server) {
         timestamp: new Date().toISOString(),
       });
 
-      // Send current users in room to the new user
+      // Get room users from active users
       const roomUsers = Array.from(activeUsers.values())
         .filter(user => user.roomName === roomName)
         .map(user => ({ username: user.username, userId: user.userId }));
@@ -40,7 +48,7 @@ export function initSocket(server) {
     });
 
     // Send message to a group
-    socket.on("group_message", ({ group, message, userId, username }) => {
+    socket.on("group_message", async ({ group, message, userId, username }) => {
       const roomName = `group_${group}`;
       const timestamp = new Date().toISOString();
       
@@ -53,25 +61,35 @@ export function initSocket(server) {
         timestamp,
       };
 
-      // Emit to everyone in the room including sender
+      // Save message to MySQL
+      try {
+        const connection = await createDbConnection();
+        await connection.execute(
+          'INSERT INTO messages (user_id, username, group_type, message, created_at) VALUES (?, ?, ?, ?, ?)',
+          [userId, username, group, message, timestamp]
+        );
+        await connection.end();
+      } catch (error) {
+        console.error('Error saving message to database:', error);
+      }
+
+      // Emit to everyone in the room
       io.to(roomName).emit("new_message", messageData);
       
       console.log(`Message in ${roomName} from ${username}: ${message}`);
     });
 
-    // Typing indicator
+    // ... rest of the socket events remain the same ...
     socket.on("typing", ({ group, username }) => {
       const roomName = `group_${group}`;
       socket.to(roomName).emit("user_typing", { username });
     });
 
-    // Stop typing indicator
     socket.on("stop_typing", ({ group, username }) => {
       const roomName = `group_${group}`;
       socket.to(roomName).emit("user_stop_typing", { username });
     });
 
-    // Leave group
     socket.on("leave_group", ({ group, username }) => {
       const roomName = `group_${group}`;
       socket.leave(roomName);
