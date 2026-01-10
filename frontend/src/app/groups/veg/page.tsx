@@ -59,6 +59,7 @@ function VegChatPage() {
         `${process.env.NEXT_PUBLIC_BACKEND_URL}users/get-user`,
         { withCredentials: true }
       );
+      console.log("Current user response:", response);
       if (response.status === 200) {
         setCurrentUser({
           id: response.data.userId,
@@ -80,6 +81,7 @@ function VegChatPage() {
         `${process.env.NEXT_PUBLIC_BACKEND_URL}messages/${group}`,
         { withCredentials: true }
       );
+      console.log("Messages response:", response);
       
       if (response.data.success) {
         setMessages(response.data.messages.reverse());

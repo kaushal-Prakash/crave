@@ -155,9 +155,15 @@ const getUserById = async (req, res) => {
 const currentuser = async (req, res) => {
   try {
     const { userId } = req.user;
+    console.log("Current user id:", req.user);
+    const connection = await connectDB();
+    const [user_data] = await connection.execute(
+      "SELECT * FROM users WHERE id = ?",
+      [userId]
+    );
     return res
       .status(200)
-      .json({ userId: userId, username: req.username, fullName: req.fullName });
+      .json({ userId: userId, username: user_data[0].username, fullName: user_data[0].fullName });
   } catch (error) {
     console.log("Error sending currnt user : ", error);
     return res.status(500).json({ message: "Internal Server Error" });
