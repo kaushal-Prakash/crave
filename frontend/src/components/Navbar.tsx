@@ -97,6 +97,13 @@ function Navbar() {
               Profile
             </Link>
             <Link
+              href="/groups"
+              onClick={() => setIsOpen(false)}
+              className="text-gray-800 hover:text-appetizingRed hover:scale-110 hover:underline transition-all duration-100 cursor-pointer"
+            >
+              Groups
+            </Link>
+            <Link
               href="/add-recipe"
               onClick={() => setIsOpen(false)}
               className="text-gray-800 hover:text-appetizingRed hover:scale-110 hover:underline transition-all duration-100 cursor-pointer"
