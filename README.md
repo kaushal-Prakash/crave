@@ -1,5 +1,6 @@
+<div align="center">
 # 🍽️ Crave – Recipe Sharing Platform
-
+</div>
 <h1 align="center">Crave v1.3.0</h1>
 <h3 align="center">Connecting Food Lovers Through Real-Time Community Chat 🥗💬🍗</h3>
 
