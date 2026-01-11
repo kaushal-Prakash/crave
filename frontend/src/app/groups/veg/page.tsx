@@ -106,6 +106,7 @@ function VegChatPage() {
       connectSocket();
     }
   }, [isConnected, connectSocket]);
+
   // Socket event listeners
   useEffect(() => {
     if (!isConnected || !socket || !currentUser) return;
@@ -123,6 +124,7 @@ function VegChatPage() {
         group_type: messageData.group,
         created_at: messageData.timestamp,
       };
+      console.log("New message received:", newMsg);
 
       setMessages((prev) => [...prev, newMsg]);
     };

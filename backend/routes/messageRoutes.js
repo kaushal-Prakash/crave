@@ -143,8 +143,9 @@ router.post("/", authMiddleware, async (req, res) => {
   let connection;
   try {
     const { group, message } = req.body;
-    const userId = req.userId;
-    const username = req.username;
+    const userId = req.user.userId;
+    const username = req.user.username;
+    console.log("Save message data:", { group, message, userId, username });
 
     connection = await connectDB();
 

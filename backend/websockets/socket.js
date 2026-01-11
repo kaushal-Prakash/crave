@@ -4,7 +4,7 @@ import db from "../services/db.js";
 export function initSocket(server) {
   const io = new Server(server, {
     cors: {
-      origin: (process.env.FRONTEND || "http://localhost:3000"),
+      origin: process.env.FRONTEND || "http://localhost:3000",
       credentials: true,
     },
   });
@@ -43,18 +43,36 @@ export function initSocket(server) {
     });
 
     socket.on("group_message", async ({ group, message, userId, username }) => {
+      console.log("Received message data:", {
+        group,
+        message,
+        userId,
+        username,
+      });
+
+      // Validate all required fields
+      if (!userId || !username || !group || !message) {
+        console.error("Missing required fields:", {
+          userId,
+          username,
+          group,
+          message,
+        });
+        return;
+      }
+
       const roomName = `group_${group}`;
       const timestamp = new Date();
 
       try {
         await db.execute(
           `INSERT INTO messages (user_id, username, group_type, message, created_at)
-           VALUES (?, ?, ?, ?, ?)`,
+       VALUES (?, ?, ?, ?, ?)`,
           [userId, username, group, message, timestamp]
         );
+        console.log("✅ Message saved to DB");
       } catch (err) {
         console.error("❌ DB insert failed:", err);
-        return;
       }
 
       io.to(roomName).emit("new_message", {
@@ -80,7 +98,8 @@ export function initSocket(server) {
           if (user.socketId === socket.id) {
             users.delete(userId);
 
-            io.to(roomName).emit("room_users",
+            io.to(roomName).emit(
+              "room_users",
               Array.from(users.entries()).map(([uid, u]) => ({
                 userId: uid,
                 username: u.username,
