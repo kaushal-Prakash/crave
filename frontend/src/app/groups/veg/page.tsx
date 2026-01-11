@@ -43,8 +43,6 @@ function VegChatPage() {
   const {
     socket,
     isConnected,
-    connectSocket,
-    disconnectSocket,
     joinGroup,
     leaveGroup,
     sendMessage,
@@ -102,9 +100,11 @@ function VegChatPage() {
 
   useEffect(() => {
     if (!isConnected) {
-      connectSocket();
+      // Try to connect via the socket instance if it exposes a connect method;
+      // otherwise assume the socket context handles connection lifecycle.
+      socket?.connect?.();
     }
-  }, [isConnected, connectSocket]);
+  }, [isConnected, socket]);
   
   // In VegChatPage component, add:
   // Socket event listeners
