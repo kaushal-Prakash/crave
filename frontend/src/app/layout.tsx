@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono,Poppins } from "next/font/google";
+import { Geist, Geist_Mono, Poppins } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import "@/styles/main.scss";
 import { ToastContainer } from "react-toastify";
+import { SocketProvider } from "@/contexts/socketContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,10 +26,10 @@ const poppins = Poppins({
 export const metadata: Metadata = {
   title: "Crave",
   description: "A simple food recipe sharing platform",
-  authors: [{name:"devShadow"}],
-  icons:{
-    icon:"/logo.png",
-  }
+  authors: [{ name: "devShadow" }],
+  icons: {
+    icon: "/logo.png",
+  },
 };
 
 export default function RootLayout({
@@ -42,7 +43,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${poppins.variable} antialiased font-(latin:poppins)`}
       >
         <Navbar />
-        {children}
+        <SocketProvider>{children}</SocketProvider>
         <Footer />
         <ToastContainer />
       </body>

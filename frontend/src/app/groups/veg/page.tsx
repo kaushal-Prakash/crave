@@ -34,12 +34,12 @@ function VegChatPage() {
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const group = "veg";
-  
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const typingTimeoutRef = useRef<NodeJS.Timeout>(null);
-  
+
   const {
     socket,
     isConnected,
@@ -82,7 +82,7 @@ function VegChatPage() {
         { withCredentials: true }
       );
       console.log("Messages response:", response);
-      
+
       if (response.data.success) {
         setMessages(response.data.messages.reverse());
       }
@@ -98,18 +98,17 @@ function VegChatPage() {
   useEffect(() => {
     fetchCurrentUser();
     fetchMessages();
-    
-    // Connect socket
-    connectSocket();
-    
-    return () => {
-      disconnectSocket();
-    };
-  }, [fetchCurrentUser, fetchMessages, connectSocket, disconnectSocket]);
+  }, [fetchCurrentUser, fetchMessages]);
 
+  // In VegChatPage component, add:
+  useEffect(() => {
+    if (!isConnected) {
+      connectSocket();
+    }
+  }, [isConnected, connectSocket]);
   // Socket event listeners
   useEffect(() => {
-    if (!socket || !currentUser) return;
+    if (!isConnected || !socket || !currentUser) return;
 
     // Join group
     joinGroup(group, currentUser.id.toString(), currentUser.username);
@@ -124,8 +123,8 @@ function VegChatPage() {
         group_type: messageData.group,
         created_at: messageData.timestamp,
       };
-      
-      setMessages(prev => [...prev, newMsg]);
+
+      setMessages((prev) => [...prev, newMsg]);
     };
 
     // Room users listener
@@ -136,7 +135,7 @@ function VegChatPage() {
     // Typing indicators
     const handleUserTyping = ({ username }: { username: string }) => {
       if (username !== currentUser.username) {
-        setTypingUsers(prev => {
+        setTypingUsers((prev) => {
           if (!prev.includes(username)) {
             return [...prev, username];
           }
@@ -146,7 +145,7 @@ function VegChatPage() {
     };
 
     const handleUserStopTyping = ({ username }: { username: string }) => {
-      setTypingUsers(prev => prev.filter(user => user !== username));
+      setTypingUsers((prev) => prev.filter((user) => user !== username));
     };
 
     // Attach listeners
@@ -183,8 +182,13 @@ function VegChatPage() {
     setSending(true);
 
     try {
-      sendMessage(group, messageToSend, currentUser.id.toString(), currentUser.username);
-      
+      sendMessage(
+        group,
+        messageToSend,
+        currentUser.id.toString(),
+        currentUser.username
+      );
+
       // Also save via API
       await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}messages`,
@@ -192,8 +196,8 @@ function VegChatPage() {
         { withCredentials: true }
       );
     } catch (error) {
-      console.error('Error sending message:', error);
-      toast.error('Failed to send message');
+      console.error("Error sending message:", error);
+      toast.error("Failed to send message");
     } finally {
       setSending(false);
       sendStopTyping(group, currentUser.username);
@@ -219,9 +223,9 @@ function VegChatPage() {
   // Format time
   const formatTime = (timestamp: string) => {
     const date = new Date(timestamp);
-    return date.toLocaleTimeString([], { 
-      hour: '2-digit', 
-      minute: '2-digit' 
+    return date.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
@@ -230,24 +234,46 @@ function VegChatPage() {
       {/* Header */}
       <div className="max-w-6xl mx-auto pt-16">
         <div className="flex items-center justify-between mb-8">
-          <Link 
-            href="/groups" 
+          <Link
+            href="/groups"
             className="flex items-center space-x-2 text-gray-600 hover:text-gray-800 transition-colors"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M10 19l-7-7m0 0l7-7m-7 7h18"
+              />
             </svg>
             <span>Back to Groups</span>
           </Link>
-          
-          <div className={`flex items-center space-x-2 px-4 py-2 rounded-full ${isConnected ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-            <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`}></div>
-            <span className="text-sm">{isConnected ? 'Connected' : 'Disconnected'}</span>
+
+          <div
+            className={`flex items-center space-x-2 px-4 py-2 rounded-full ${
+              isConnected
+                ? "bg-green-100 text-green-800"
+                : "bg-red-100 text-red-800"
+            }`}
+          >
+            <div
+              className={`w-2 h-2 rounded-full ${
+                isConnected ? "bg-green-500" : "bg-red-500"
+              }`}
+            ></div>
+            <span className="text-sm">
+              {isConnected ? "Connected" : "Disconnected"}
+            </span>
           </div>
         </div>
 
         {/* Chat Header */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           className="bg-white rounded-3xl shadow-2xl p-6 mb-6"
@@ -277,16 +303,20 @@ function VegChatPage() {
                 </div>
               </div>
             </div>
-            
+
             <div className="flex items-center space-x-4">
               <div className="text-right">
                 <div className="text-sm text-gray-500">You are:</div>
                 <div className="font-bold text-gray-800">
-                  {currentUser?.fullName || currentUser?.username || "Loading..."}
+                  {currentUser?.fullName ||
+                    currentUser?.username ||
+                    "Loading..."}
                 </div>
               </div>
               <div className="w-10 h-10 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center text-white font-bold">
-                {(currentUser?.fullName || currentUser?.username || "U").charAt(0).toUpperCase()}
+                {(currentUser?.fullName || currentUser?.username || "U")
+                  .charAt(0)
+                  .toUpperCase()}
               </div>
             </div>
           </div>
@@ -300,7 +330,7 @@ function VegChatPage() {
               <h2 className="text-xl font-bold text-gray-800 mb-4">
                 Online Users ({users.length})
               </h2>
-              
+
               <div className="space-y-3 max-h-[400px] overflow-y-auto">
                 {users.map((user) => (
                   <div
@@ -310,7 +340,9 @@ function VegChatPage() {
                     <div className="w-8 h-8 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center text-white font-semibold">
                       {user.username.charAt(0).toUpperCase()}
                     </div>
-                    <span className="font-medium text-gray-800">{user.username}</span>
+                    <span className="font-medium text-gray-800">
+                      {user.username}
+                    </span>
                   </div>
                 ))}
                 {users.length === 0 && (
@@ -324,21 +356,27 @@ function VegChatPage() {
               {/* Typing Indicators */}
               <AnimatePresence>
                 {typingUsers.length > 0 && (
-                  <motion.div 
+                  <motion.div
                     initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
+                    animate={{ opacity: 1, height: "auto" }}
                     exit={{ opacity: 0, height: 0 }}
                     className="mt-4 p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl"
                   >
                     <div className="text-sm text-green-700 font-medium flex items-center">
                       <div className="flex space-x-1 mr-2">
                         <div className="w-2 h-2 bg-green-500 rounded-full animate-bounce"></div>
-                        <div className="w-2 h-2 bg-green-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                        <div className="w-2 h-2 bg-green-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                        <div
+                          className="w-2 h-2 bg-green-500 rounded-full animate-bounce"
+                          style={{ animationDelay: "0.1s" }}
+                        ></div>
+                        <div
+                          className="w-2 h-2 bg-green-500 rounded-full animate-bounce"
+                          style={{ animationDelay: "0.2s" }}
+                        ></div>
                       </div>
                       {typingUsers.length === 1
                         ? `${typingUsers[0]} is typing...`
-                        : `${typingUsers.slice(0, 2).join(', ')} are typing...`}
+                        : `${typingUsers.slice(0, 2).join(", ")} are typing...`}
                     </div>
                   </motion.div>
                 )}
@@ -355,7 +393,7 @@ function VegChatPage() {
               </div>
 
               {/* Messages Container */}
-              <div 
+              <div
                 ref={chatContainerRef}
                 className="flex-1 overflow-y-auto p-4 space-y-4"
               >
@@ -367,8 +405,12 @@ function VegChatPage() {
                 ) : messages.length === 0 ? (
                   <div className="text-center py-12">
                     <div className="text-6xl mb-4">💬</div>
-                    <h3 className="text-xl font-semibold text-gray-800 mb-2">No messages yet</h3>
-                    <p className="text-gray-600">Be the first to start the conversation!</p>
+                    <h3 className="text-xl font-semibold text-gray-800 mb-2">
+                      No messages yet
+                    </h3>
+                    <p className="text-gray-600">
+                      Be the first to start the conversation!
+                    </p>
                   </div>
                 ) : (
                   messages.map((msg, index) => {
@@ -379,9 +421,15 @@ function VegChatPage() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: index * 0.05 }}
-                        className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'}`}
+                        className={`flex ${
+                          isCurrentUser ? "justify-end" : "justify-start"
+                        }`}
                       >
-                        <div className={`max-w-[70%] ${isCurrentUser ? 'ml-auto' : 'mr-auto'}`}>
+                        <div
+                          className={`max-w-[70%] ${
+                            isCurrentUser ? "ml-auto" : "mr-auto"
+                          }`}
+                        >
                           {!isCurrentUser && (
                             <div className="flex items-center space-x-2 mb-1">
                               <div className="w-6 h-6 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center text-white text-xs font-semibold">
@@ -392,9 +440,21 @@ function VegChatPage() {
                               </span>
                             </div>
                           )}
-                          <div className={`rounded-2xl p-4 ${isCurrentUser ? 'bg-gradient-to-r from-green-100 to-emerald-100' : 'bg-gray-100'}`}>
+                          <div
+                            className={`rounded-2xl p-4 ${
+                              isCurrentUser
+                                ? "bg-gradient-to-r from-green-100 to-emerald-100"
+                                : "bg-gray-100"
+                            }`}
+                          >
                             <p className="text-gray-800">{msg.message}</p>
-                            <div className={`text-xs mt-2 ${isCurrentUser ? 'text-right text-gray-500' : 'text-gray-400'}`}>
+                            <div
+                              className={`text-xs mt-2 ${
+                                isCurrentUser
+                                  ? "text-right text-gray-500"
+                                  : "text-gray-400"
+                              }`}
+                            >
                               {formatTime(msg.created_at)}
                             </div>
                           </div>
@@ -434,7 +494,8 @@ function VegChatPage() {
                   </button>
                 </form>
                 <p className="text-xs text-gray-500 mt-2 text-center">
-                  Press Enter to send • Connect with other vegetarian food lovers
+                  Press Enter to send • Connect with other vegetarian food
+                  lovers
                 </p>
               </div>
             </div>
