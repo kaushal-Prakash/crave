@@ -23,10 +23,12 @@ interface User {
 }
 
 function NonVegChatPage() {
+  const group = "non-veg";
+
   const [messages, setMessages] = useState<Message[]>([]);
-  const [newMessage, setNewMessage] = useState("");
   const [users, setUsers] = useState<User[]>([]);
   const [typingUsers, setTypingUsers] = useState<string[]>([]);
+  const [newMessage, setNewMessage] = useState("");
   const [currentUser, setCurrentUser] = useState<{
     id: number;
     username: string;
@@ -34,18 +36,16 @@ function NonVegChatPage() {
   } | null>(null);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
-  const group = "non-veg";
-  
+
+  const joinedRef = useRef(false);
+  const listenersRef = useRef(false);
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const chatContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const typingTimeoutRef = useRef<NodeJS.Timeout>();
-  
+
   const {
     socket,
     isConnected,
-    connectSocket,
-    disconnectSocket,
     joinGroup,
     leaveGroup,
     sendMessage,
@@ -53,146 +53,126 @@ function NonVegChatPage() {
     sendStopTyping,
   } = useSocket();
 
-  // Fetch current user
+  /* ------------------ FETCH USER ------------------ */
   const fetchCurrentUser = useCallback(async () => {
     try {
-      const response = await axios.get(
+      const res = await axios.get(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}users/get-user`,
         { withCredentials: true }
       );
-      if (response.status === 200) {
-        setCurrentUser({
-          id: response.data.userId,
-          username: response.data.username,
-          fullName: response.data.fullName,
-        });
-      }
-    } catch (error) {
-      console.error("Error fetching user:", error);
-      toast.error("Failed to load user data");
+      setCurrentUser({
+        id: res.data.userId,
+        username: res.data.username,
+        fullName: res.data.fullName,
+      });
+    } catch {
+      toast.error("Failed to load user");
     }
   }, []);
 
-  // Fetch messages
+  /* ------------------ FETCH MESSAGES ------------------ */
   const fetchMessages = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await axios.get(
+      const res = await axios.get(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}messages/${group}`,
         { withCredentials: true }
       );
-      
-      if (response.data.success) {
-        setMessages(response.data.messages.reverse());
+      if (res.data.success) {
+        setMessages(res.data.messages.reverse());
       }
-    } catch (error) {
-      console.error("Error fetching messages:", error);
+    } catch {
       toast.error("Failed to load messages");
     } finally {
       setLoading(false);
     }
   }, [group]);
 
-  // Initial load
   useEffect(() => {
     fetchCurrentUser();
     fetchMessages();
-    
-    // Connect socket
-    connectSocket();
-    
-    return () => {
-      disconnectSocket();
-    };
-  }, [fetchCurrentUser, fetchMessages, connectSocket, disconnectSocket]);
+  }, [fetchCurrentUser, fetchMessages]);
 
-  // Socket event listeners
+  /* ------------------ JOIN GROUP ------------------ */
   useEffect(() => {
-    if (!socket || !currentUser) return;
+    if (!socket || !currentUser || !isConnected) return;
+    if (joinedRef.current) return;
 
-    // Join group
     joinGroup(group, currentUser.id.toString(), currentUser.username);
-
-    // Message listener
-    const handleNewMessage = (messageData: any) => {
-      const newMsg: Message = {
-        id: Date.now(),
-        user_id: parseInt(messageData.userId),
-        username: messageData.username,
-        message: messageData.message,
-        group_type: messageData.group,
-        created_at: messageData.timestamp,
-      };
-      
-      setMessages(prev => [...prev, newMsg]);
-    };
-
-    // Room users listener
-    const handleRoomUsers = (usersList: User[]) => {
-      setUsers(usersList);
-    };
-
-    // Typing indicators
-    const handleUserTyping = ({ username }: { username: string }) => {
-      if (username !== currentUser.username) {
-        setTypingUsers(prev => {
-          if (!prev.includes(username)) {
-            return [...prev, username];
-          }
-          return prev;
-        });
-      }
-    };
-
-    const handleUserStopTyping = ({ username }: { username: string }) => {
-      setTypingUsers(prev => prev.filter(user => user !== username));
-    };
-
-    // Attach listeners
-    socket.on("new_message", handleNewMessage);
-    socket.on("room_users", handleRoomUsers);
-    socket.on("user_typing", handleUserTyping);
-    socket.on("user_stop_typing", handleUserStopTyping);
+    joinedRef.current = true;
 
     return () => {
-      if (currentUser) {
-        leaveGroup(group, currentUser.username);
-      }
-      socket.off("new_message", handleNewMessage);
-      socket.off("room_users", handleRoomUsers);
-      socket.off("user_typing", handleUserTyping);
-      socket.off("user_stop_typing", handleUserStopTyping);
+      leaveGroup(group, currentUser.username);
+      joinedRef.current = false;
     };
-  }, [socket, group, currentUser, joinGroup, leaveGroup]);
+  }, [socket, currentUser, isConnected, group, joinGroup, leaveGroup]);
 
-  // Auto-scroll to bottom
+  /* ------------------ SOCKET LISTENERS ------------------ */
   useEffect(() => {
-    if (messages.length > 0) {
-      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    }
+    if (!socket || listenersRef.current) return;
+
+    socket.on("new_message", (data) => {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: Date.now(),
+          user_id: Number(data.userId),
+          username: data.username,
+          message: data.message,
+          group_type: data.group,
+          created_at: data.timestamp,
+        },
+      ]);
+    });
+
+    socket.on("room_users", (list: User[]) => {
+      setUsers(list);
+    });
+
+    socket.on("user_typing", ({ username }) => {
+      setTypingUsers((prev) =>
+        prev.includes(username) ? prev : [...prev, username]
+      );
+    });
+
+    socket.on("user_stop_typing", ({ username }) => {
+      setTypingUsers((prev) => prev.filter((u) => u !== username));
+    });
+
+    listenersRef.current = true;
+
+    return () => {
+      socket.off("new_message");
+      socket.off("room_users");
+      socket.off("user_typing");
+      socket.off("user_stop_typing");
+      listenersRef.current = false;
+    };
+  }, [socket]);
+
+  /* ------------------ AUTO SCROLL ------------------ */
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages.length]);
 
-  // Handle sending message
+  /* ------------------ SEND MESSAGE ------------------ */
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newMessage.trim() || !currentUser || sending) return;
 
-    const messageToSend = newMessage.trim();
+    const text = newMessage.trim();
     setNewMessage("");
     setSending(true);
 
     try {
-      sendMessage(group, messageToSend, currentUser.id.toString(), currentUser.username);
-      
-      // Also save via API
+      sendMessage(group, text, currentUser.id.toString(), currentUser.username);
       await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}messages`,
-        { group, message: messageToSend },
+        { group, message: text },
         { withCredentials: true }
       );
-    } catch (error) {
-      console.error('Error sending message:', error);
-      toast.error('Failed to send message');
+    } catch {
+      toast.error("Message failed");
     } finally {
       setSending(false);
       sendStopTyping(group, currentUser.username);
@@ -200,53 +180,65 @@ function NonVegChatPage() {
     }
   };
 
-  // Typing indicator handler
+  /* ------------------ TYPING ------------------ */
   const handleTyping = () => {
     if (!currentUser) return;
-
-    if (typingTimeoutRef.current) {
-      clearTimeout(typingTimeoutRef.current);
-    }
-
     sendTyping(group, currentUser.username);
 
+    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
     typingTimeoutRef.current = setTimeout(() => {
-      sendStopTyping(group, currentUser!.username);
+      sendStopTyping(group, currentUser.username);
     }, 1500);
   };
 
-  // Format time
-  const formatTime = (timestamp: string) => {
-    const date = new Date(timestamp);
-    return date.toLocaleTimeString([], { 
-      hour: '2-digit', 
-      minute: '2-digit' 
-    });
-  };
+  const formatTime = (t: string) =>
+    new Date(t).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-100 p-4 md:p-6">
       {/* Header */}
       <div className="max-w-6xl mx-auto pt-16">
         <div className="flex items-center justify-between mb-8">
-          <Link 
-            href="/groups" 
+          <Link
+            href="/groups"
             className="flex items-center space-x-2 text-gray-600 hover:text-gray-800 transition-colors"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M10 19l-7-7m0 0l7-7m-7 7h18"
+              />
             </svg>
             <span>Back to Groups</span>
           </Link>
-          
-          <div className={`flex items-center space-x-2 px-4 py-2 rounded-full ${isConnected ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-            <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`}></div>
-            <span className="text-sm">{isConnected ? 'Connected' : 'Disconnected'}</span>
+
+          <div
+            className={`flex items-center space-x-2 px-4 py-2 rounded-full ${
+              isConnected
+                ? "bg-green-100 text-green-800"
+                : "bg-red-100 text-red-800"
+            }`}
+          >
+            <div
+              className={`w-2 h-2 rounded-full ${
+                isConnected ? "bg-green-500" : "bg-red-500"
+              }`}
+            ></div>
+            <span className="text-sm">
+              {isConnected ? "Connected" : "Disconnected"}
+            </span>
           </div>
         </div>
 
         {/* Chat Header */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           className="bg-white rounded-3xl shadow-2xl p-6 mb-6"
@@ -276,16 +268,20 @@ function NonVegChatPage() {
                 </div>
               </div>
             </div>
-            
+
             <div className="flex items-center space-x-4">
               <div className="text-right">
                 <div className="text-sm text-gray-500">You are:</div>
                 <div className="font-bold text-gray-800">
-                  {currentUser?.fullName || currentUser?.username || "Loading..."}
+                  {currentUser?.fullName ||
+                    currentUser?.username ||
+                    "Loading..."}
                 </div>
               </div>
               <div className="w-10 h-10 bg-gradient-to-br from-red-400 to-orange-500 rounded-full flex items-center justify-center text-white font-bold">
-                {(currentUser?.fullName || currentUser?.username || "U").charAt(0).toUpperCase()}
+                {(currentUser?.fullName || currentUser?.username || "U")
+                  .charAt(0)
+                  .toUpperCase()}
               </div>
             </div>
           </div>
@@ -299,7 +295,7 @@ function NonVegChatPage() {
               <h2 className="text-xl font-bold text-gray-800 mb-4">
                 Online Users ({users.length})
               </h2>
-              
+
               <div className="space-y-3 max-h-[400px] overflow-y-auto">
                 {users.map((user) => (
                   <div
@@ -309,7 +305,9 @@ function NonVegChatPage() {
                     <div className="w-8 h-8 bg-gradient-to-br from-red-400 to-orange-500 rounded-full flex items-center justify-center text-white font-semibold">
                       {user.username.charAt(0).toUpperCase()}
                     </div>
-                    <span className="font-medium text-gray-800">{user.username}</span>
+                    <span className="font-medium text-gray-800">
+                      {user.username}
+                    </span>
                   </div>
                 ))}
                 {users.length === 0 && (
@@ -323,21 +321,27 @@ function NonVegChatPage() {
               {/* Typing Indicators */}
               <AnimatePresence>
                 {typingUsers.length > 0 && (
-                  <motion.div 
+                  <motion.div
                     initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
+                    animate={{ opacity: 1, height: "auto" }}
                     exit={{ opacity: 0, height: 0 }}
                     className="mt-4 p-4 bg-gradient-to-r from-red-50 to-orange-50 rounded-xl"
                   >
                     <div className="text-sm text-red-700 font-medium flex items-center">
                       <div className="flex space-x-1 mr-2">
                         <div className="w-2 h-2 bg-red-500 rounded-full animate-bounce"></div>
-                        <div className="w-2 h-2 bg-red-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                        <div className="w-2 h-2 bg-red-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                        <div
+                          className="w-2 h-2 bg-red-500 rounded-full animate-bounce"
+                          style={{ animationDelay: "0.1s" }}
+                        ></div>
+                        <div
+                          className="w-2 h-2 bg-red-500 rounded-full animate-bounce"
+                          style={{ animationDelay: "0.2s" }}
+                        ></div>
                       </div>
                       {typingUsers.length === 1
                         ? `${typingUsers[0]} is typing...`
-                        : `${typingUsers.slice(0, 2).join(', ')} are typing...`}
+                        : `${typingUsers.slice(0, 2).join(", ")} are typing...`}
                     </div>
                   </motion.div>
                 )}
@@ -354,8 +358,7 @@ function NonVegChatPage() {
               </div>
 
               {/* Messages Container */}
-              <div 
-                ref={chatContainerRef}
+              <div
                 className="flex-1 overflow-y-auto p-4 space-y-4"
               >
                 {loading ? (
@@ -366,8 +369,12 @@ function NonVegChatPage() {
                 ) : messages.length === 0 ? (
                   <div className="text-center py-12">
                     <div className="text-6xl mb-4">💬</div>
-                    <h3 className="text-xl font-semibold text-gray-800 mb-2">No messages yet</h3>
-                    <p className="text-gray-600">Be the first to start the conversation!</p>
+                    <h3 className="text-xl font-semibold text-gray-800 mb-2">
+                      No messages yet
+                    </h3>
+                    <p className="text-gray-600">
+                      Be the first to start the conversation!
+                    </p>
                   </div>
                 ) : (
                   messages.map((msg, index) => {
@@ -378,9 +385,15 @@ function NonVegChatPage() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: index * 0.05 }}
-                        className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'}`}
+                        className={`flex ${
+                          isCurrentUser ? "justify-end" : "justify-start"
+                        }`}
                       >
-                        <div className={`max-w-[70%] ${isCurrentUser ? 'ml-auto' : 'mr-auto'}`}>
+                        <div
+                          className={`max-w-[70%] ${
+                            isCurrentUser ? "ml-auto" : "mr-auto"
+                          }`}
+                        >
                           {!isCurrentUser && (
                             <div className="flex items-center space-x-2 mb-1">
                               <div className="w-6 h-6 bg-gradient-to-br from-red-400 to-orange-500 rounded-full flex items-center justify-center text-white text-xs font-semibold">
@@ -391,9 +404,21 @@ function NonVegChatPage() {
                               </span>
                             </div>
                           )}
-                          <div className={`rounded-2xl p-4 ${isCurrentUser ? 'bg-gradient-to-r from-red-100 to-orange-100' : 'bg-gray-100'}`}>
+                          <div
+                            className={`rounded-2xl p-4 ${
+                              isCurrentUser
+                                ? "bg-gradient-to-r from-red-100 to-orange-100"
+                                : "bg-gray-100"
+                            }`}
+                          >
                             <p className="text-gray-800">{msg.message}</p>
-                            <div className={`text-xs mt-2 ${isCurrentUser ? 'text-right text-gray-500' : 'text-gray-400'}`}>
+                            <div
+                              className={`text-xs mt-2 ${
+                                isCurrentUser
+                                  ? "text-right text-gray-500"
+                                  : "text-gray-400"
+                              }`}
+                            >
                               {formatTime(msg.created_at)}
                             </div>
                           </div>
@@ -433,7 +458,8 @@ function NonVegChatPage() {
                   </button>
                 </form>
                 <p className="text-xs text-gray-500 mt-2 text-center">
-                  Press Enter to send • Connect with other non-vegetarian food lovers
+                  Press Enter to send • Connect with other non-vegetarian food
+                  lovers
                 </p>
               </div>
             </div>

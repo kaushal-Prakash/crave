@@ -100,13 +100,13 @@ function VegChatPage() {
     fetchMessages();
   }, [fetchCurrentUser, fetchMessages]);
 
-  // In VegChatPage component, add:
   useEffect(() => {
     if (!isConnected) {
       connectSocket();
     }
   }, [isConnected, connectSocket]);
-
+  
+  // In VegChatPage component, add:
   // Socket event listeners
   useEffect(() => {
     if (!isConnected || !socket || !currentUser) return;
