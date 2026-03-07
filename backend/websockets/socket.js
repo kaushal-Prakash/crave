@@ -1,7 +1,10 @@
 import { Server } from "socket.io";
 import db from "../services/db.js";
 
+//this function ataches the Socket.IO server to our existing HTTP server and sets up event listeners for real-time communication.
 export function initSocket(server) {
+
+  // Create a new Socket.IO server and attach it to the existing HTTP server
   const io = new Server(server, {
     cors: {
       origin: process.env.FRONTEND || "http://localhost:3000",
@@ -12,11 +15,13 @@ export function initSocket(server) {
   /**
    * Map<roomName, Map<userId, { username, socketId }>>
    */
-  const rooms = new Map();
+  const rooms = new Map(); // In-memory store for room users
 
+  // Listen for new client connections
   io.on("connection", (socket) => {
     console.log("✅ User connected:", socket.id);
 
+    //triggered when a user joins a group chat room. It adds the user to the specified room and broadcasts the updated list of users in that room to all members.
     socket.on("join_group", ({ group, userId, username }) => {
       const roomName = `group_${group}`;
       socket.join(roomName);
