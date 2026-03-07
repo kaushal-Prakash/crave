@@ -23,6 +23,8 @@ const getRecipeById = async (req, res) => {
     }
 
     const connection = await connectDB();
+
+    //in mysql its is recommended to use prepared statements to prevent SQL injection attacks. eg: like this connection.execute("select * from recipes where id = ?", [id]) instead of connection.query("select * from recipes where id = " + id)
     const [result] = await connection.execute(
       "select * from recipes where id = ?",
       [id]
