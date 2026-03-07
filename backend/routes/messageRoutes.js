@@ -12,6 +12,7 @@ router.get("/recent", authMiddleware, async (req, res) => {
   try {
     connection = await connectDB();
 
+    //left join return all rows from messages if matching user exists → add user data if not → return NULL for that message's user data
     const [vegMessages] = await connection.execute(
       `SELECT m.*, u.fullName, u.username
        FROM messages m
@@ -21,6 +22,7 @@ router.get("/recent", authMiddleware, async (req, res) => {
        LIMIT 5`
     );
 
+    //left join return all rows from messages if matching user exists → add user data if not → return NULL for that message's user data
     const [nonVegMessages] = await connection.execute(
       `SELECT m.*, u.fullName, u.username
        FROM messages m
@@ -54,16 +56,24 @@ router.get("/stats", authMiddleware, async (req, res) => {
   try {
     connection = await connectDB();
 
+    //fixed the design flaw in stats calculation by using conditional aggregation to count distinct users active in the last 30 seconds for each group type in a single query.
+
     const [veg] = await connection.execute(
       `SELECT COUNT(*) AS totalMessages,
-              COUNT(DISTINCT user_id) AS onlineUsers
+              COUNT(DISTINCT CASE 
+                WHEN last_seen >= NOW() - INTERVAL 30 SECOND 
+                THEN user_id 
+              END) AS onlineUsers
        FROM messages
        WHERE group_type = 'veg'`
     );
 
     const [nonVeg] = await connection.execute(
       `SELECT COUNT(*) AS totalMessages,
-              COUNT(DISTINCT user_id) AS onlineUsers
+              COUNT(DISTINCT CASE 
+                WHEN last_seen >= NOW() - INTERVAL 30 SECOND 
+                THEN user_id 
+              END) AS onlineUsers
        FROM messages
        WHERE group_type = 'non-veg'`
     );
@@ -103,7 +113,7 @@ router.get("/:group", authMiddleware, async (req, res) => {
 
     connection = await connectDB();
 
-    // ❗ LIMIT & OFFSET must be inline (MySQL rule)
+    // ❗ LIMIT & OFFSET must be inline (MySQL rule) – can't use placeholders for them → need to validate/sanitize them manually to prevent SQL injection
     const [messages] = await connection.execute(
       `SELECT m.*, u.fullName, u.username
        FROM messages m

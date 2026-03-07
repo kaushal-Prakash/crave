@@ -71,6 +71,7 @@ const createTables = async () => {
         username VARCHAR(50) NOT NULL,
         group_type ENUM('veg', 'non-veg') NOT NULL,
         message TEXT NOT NULL,
+        last_seen TIMESTAMP,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         INDEX idx_group_type (group_type),
         INDEX idx_created_at (created_at),
