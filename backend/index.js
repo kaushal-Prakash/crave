@@ -34,6 +34,7 @@ app.use("/messages", messageRoutes);
 app.use("/", uploadRoutes )
 
 // Static folder
+//static files are files that clients can access directly without any server processing.
 app.use("/uploads", express.static("uploads"));
 
 app.get("/", (req, res) => {
