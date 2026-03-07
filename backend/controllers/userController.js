@@ -83,6 +83,10 @@ const userSignup = async (req, res) => {
 
     // 3 parts hai -> payload(is encoded not encrypted so dont store sensitive info), header(tells which algo was used eg hs256), signature(to known if it was tampered)
 
+    //jwt not encrypts data but encodes it, so anyone can decode and read the payload. That’s why you should never put sensitive info (like passwords) in a JWT. Instead, you typically include a user ID and maybe a username or role, which the server can use to identify the user on subsequent requests.
+
+    //but jwt is signed using a secret key (or a public/private key pair), so while anyone can read the payload, they cannot modify it without the secret. If someone tries to change the data, the signature will no longer match, and the server will reject the token as invalid. Its is verified usint fn jwt.verify(token, secret) which checks the signature and also checks if the token is expired or not based on the exp field in payload.
+
     const token = jwt.sign({ userId, username }, process.env.JWT_SECRET, {
       expiresIn: "7d",
     });
