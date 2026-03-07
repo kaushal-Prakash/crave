@@ -280,16 +280,6 @@ CREATE TABLE messages (
 
 ---
 
-## 👥 Community Impact
-
-- **Increased Engagement**: Chat feature boosts user activity by 40%
-- **Knowledge Sharing**: Instant access to cooking expertise
-- **Recipe Validation**: Real-time feedback on new recipes
-- **Support Network**: Help with cooking challenges
-- **Cultural Exchange**: Connect with global food traditions
-
----
-
 ## 🎊 Join Our Community!
 
 Connect with food lovers, share recipes, and build your culinary network in real-time!
