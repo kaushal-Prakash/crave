@@ -17,7 +17,7 @@ function GroupsPage() {
   const [recentVegMessages, setRecentVegMessages] = useState<RecentMessage[]>([]);
   const [recentNonVegMessages, setRecentNonVegMessages] = useState<RecentMessage[]>([]);
   const [loading, setLoading] = useState(true);
-  const [groupStats, setGroupStats] = useState({
+  const [groupStats] = useState({
     veg: { onlineUsers: 12, totalMessages: 256 },
     nonVeg: { onlineUsers: 18, totalMessages: 342 }
   });

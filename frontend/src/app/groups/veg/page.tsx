@@ -115,7 +115,7 @@ function VegChatPage() {
     joinGroup(group, currentUser.id.toString(), currentUser.username);
 
     // Message listener
-    const handleNewMessage = (messageData: any) => {
+    const handleNewMessage = (messageData: { userId: string; username: string; message: string; group: string; timestamp: string }) => {
       const newMsg: Message = {
         id: Date.now(),
         user_id: parseInt(messageData.userId),
@@ -165,7 +165,7 @@ function VegChatPage() {
       socket.off("user_typing", handleUserTyping);
       socket.off("user_stop_typing", handleUserStopTyping);
     };
-  }, [socket, group, currentUser, joinGroup, leaveGroup]);
+  }, [socket, group, currentUser, joinGroup, leaveGroup, isConnected]);
 
   // Auto-scroll to bottom
   useEffect(() => {

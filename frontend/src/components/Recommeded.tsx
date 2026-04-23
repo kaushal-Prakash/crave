@@ -23,7 +23,8 @@ function Recommended({ userId }: RecommendedProps) {
     }
     
     fetchRecommendedRecipes();
-  }, [userId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId, currentUserId]);
 
   const fetchRecommendedRecipes = async () => {
     try {
@@ -46,16 +47,20 @@ function Recommended({ userId }: RecommendedProps) {
       } else {
         throw new Error("Invalid response format");
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error fetching recommended recipes:", error);
       
       let errorMessage = "Unable to fetch recommendations";
-      if (error.response) {
-        errorMessage = `Server error: ${error.response.status}`;
-      } else if (error.request) {
-        errorMessage = "Network error. Please check your connection.";
-      } else if (error.code === 'ECONNABORTED') {
-        errorMessage = "Request timeout. Please try again.";
+      if (axios.isAxiosError(error)) {
+        if (error.response) {
+          errorMessage = `Server error: ${error.response.status}`;
+        } else if (error.request) {
+          errorMessage = "Network error. Please check your connection.";
+        } else if (error.code === 'ECONNABORTED') {
+          errorMessage = "Request timeout. Please try again.";
+        }
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
       }
       
       setError(errorMessage);
