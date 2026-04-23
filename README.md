@@ -159,6 +159,27 @@ Runs:
 
 ---
 
+## 🐳 Docker Deployment & CI/CD
+
+The application is fully pre-configured for containerized deployment and automated testing.
+
+### Docker
+Run the entire stack with a single command using Docker Compose:
+```bash
+docker-compose up --build
+```
+This automatically spins up the Frontend (Port 3000), Backend (Port 4000), and AI Microservice (Port 8000).
+
+### Continuous Integration (GitHub Actions)
+A simple and effective automated **CI workflow** (`.github/workflows/ci.yml`) is included:
+- **Triggers**: On every push and pull request to the `main` branch.
+- **Linting**: Validates frontend code formatting and catches early errors.
+- **Docker Build Checks**: Automatically builds the Docker images for all three microservices to guarantee that new code changes don't break the deployment builds.
+
+*Note for Campus Interviews: This streamlined CI/CD pipeline clearly demonstrates containerization and automated testing best practices without overcomplicating the infrastructure.*
+
+---
+
 ## 💬 Chat API Endpoints
 
 ### Socket.IO Events
