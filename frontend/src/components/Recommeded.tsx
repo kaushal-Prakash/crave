@@ -1,164 +1,206 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import RecipeCard from "./RecipeCard";
 import { recipe } from "@/types/types";
 import axios from "axios";
 import { toast } from "react-toastify";
 
 interface RecommendedProps {
-  userId?: number; // Optional prop to make it reusable
+  /** Pass to get user-taste-profile recommendations */
+  userId?: number;
+  /** Pass to get "similar to this recipe" recommendations (takes priority) */
+  recipeId?: number;
+  /** Optional title override */
+  title?: string;
 }
 
-function Recommended({ userId }: RecommendedProps) {
+// ─── Skeleton card ──────────────────────────────────────────────────────────
+function SkeletonCard() {
+  return (
+    <div className="rounded-xl overflow-hidden border border-orange-100 shadow-sm animate-pulse bg-white">
+      <div className="h-40 bg-gradient-to-br from-orange-100 to-yellow-100" />
+      <div className="p-4 space-y-3">
+        <div className="h-4 bg-orange-100 rounded w-3/4" />
+        <div className="h-3 bg-orange-50 rounded w-full" />
+        <div className="h-3 bg-orange-50 rounded w-5/6" />
+        <div className="flex items-center gap-2 mt-4">
+          <div className="h-6 w-6 rounded-full bg-orange-100" />
+          <div className="h-3 bg-orange-100 rounded w-24" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Main component ──────────────────────────────────────────────────────────
+function Recommended({ userId, recipeId, title }: RecommendedProps) {
   const [recommendedRecipes, setRecommendedRecipes] = useState<recipe[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [currentUserId, setCurrentUserId] = useState<number | null>(null);
+  const [mode, setMode] = useState<"similar" | "user" | null>(null);
 
-  useEffect(() => {
-    // Get current user ID from localStorage if available
-    const storedUserId = localStorage.getItem("currentUserId");
-    if (storedUserId) {
-      setCurrentUserId(Number(storedUserId));
-    }
-    
-    fetchRecommendedRecipes();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userId, currentUserId]);
+  const fetchRecommendedRecipes = useCallback(async () => {
+    setLoading(true);
+    setError(null);
 
-  const fetchRecommendedRecipes = async () => {
     try {
-      setLoading(true);
-      setError(null);
-      
-      // Use userId prop or current user ID
-      const targetUserId = userId || currentUserId || 1;
-      
-      const response = await axios.get(
-        `http://127.0.0.1:8000/recommend/${targetUserId}`,
-        { 
-          withCredentials: true,
-          timeout: 10000 // 10 second timeout
-        }
-      );
+      let response;
 
-      if (response.status === 200 && response.data) {
+      if (recipeId) {
+        // Priority 1: content-based similarity to this specific recipe
+        response = await axios.get(
+          `http://127.0.0.1:8000/similar/${recipeId}`,
+          { withCredentials: true, timeout: 10000 }
+        );
+        setMode("similar");
+      } else if (userId) {
+        // Priority 2: user taste-profile centroid
+        response = await axios.get(
+          `http://127.0.0.1:8000/recommend-user/${userId}`,
+          { withCredentials: true, timeout: 10000 }
+        );
+        setMode("user");
+      } else {
+        setLoading(false);
+        return;
+      }
+
+      if (response.status === 200 && Array.isArray(response.data)) {
         setRecommendedRecipes(response.data);
       } else {
-        throw new Error("Invalid response format");
+        throw new Error("Unexpected response format");
       }
-    } catch (error: unknown) {
-      console.error("Error fetching recommended recipes:", error);
-      
-      let errorMessage = "Unable to fetch recommendations";
-      if (axios.isAxiosError(error)) {
-        if (error.response) {
-          errorMessage = `Server error: ${error.response.status}`;
-        } else if (error.request) {
-          errorMessage = "Network error. Please check your connection.";
-        } else if (error.code === 'ECONNABORTED') {
-          errorMessage = "Request timeout. Please try again.";
-        }
-      } else if (error instanceof Error) {
-        errorMessage = error.message;
+    } catch (err: unknown) {
+      console.error("Error fetching recommendations:", err);
+
+      let msg = "Unable to fetch recommendations";
+      if (axios.isAxiosError(err)) {
+        if (err.code === "ECONNABORTED") msg = "Request timed out. Please try again.";
+        else if (err.request) msg = "Recommender service is offline.";
+        else if (err.response) msg = `Server error: ${err.response.status}`;
+      } else if (err instanceof Error) {
+        msg = err.message;
       }
-      
-      setError(errorMessage);
-      toast.error(errorMessage);
+
+      setError(msg);
     } finally {
       setLoading(false);
     }
-  };
+  }, [recipeId, userId]);
+
+  useEffect(() => {
+    fetchRecommendedRecipes();
+  }, [fetchRecommendedRecipes]);
 
   const handleDeleteRecipe = (recipeId: number) => {
-    setRecommendedRecipes(prevRecipes => 
-      prevRecipes.filter(recipe => recipe.id !== recipeId)
-    );
-    toast.success("Recipe removed from recommendations");
+    setRecommendedRecipes((prev) => prev.filter((r) => r.id !== recipeId));
   };
 
-  const handleUpdateRecipe = () => {
-    // Refresh recommendations after update
-    fetchRecommendedRecipes();
-  };
-
-  const renderContent = () => {
-    if (loading) {
-      return (
-        <div className="flex justify-center items-center h-64">
-          <div className="animate-pulse flex flex-col items-center">
-            <div className="h-4 bg-gray-300 rounded w-48 mb-4"></div>
-            <div className="h-4 bg-gray-300 rounded w-32"></div>
-          </div>
-        </div>
-      );
-    }
-
-    if (error) {
-      return (
-        <div className="flex flex-col justify-center items-center h-64 p-4 bg-red-50 rounded-lg">
-          <div className="text-xl text-red-600 mb-4">{error}</div>
-          <button
-            onClick={fetchRecommendedRecipes}
-            className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors font-medium"
-          >
-            Try Again
-          </button>
-        </div>
-      );
-    }
-
-    if (recommendedRecipes.length === 0) {
-      return (
-        <div className="flex flex-col justify-center items-center h-64 p-8 bg-gray-50 rounded-lg text-center">
-          <div className="text-xl text-gray-600 mb-4">
-            No recommendations available
-          </div>
-          <p className="text-gray-500 mb-6">
-            Try interacting with more recipes to get personalized recommendations!
-          </p>
-        </div>
-      );
-    }
-
+  // ── Loading skeleton ──
+  if (loading) {
     return (
-      <>
+      <div>
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-gray-800">
-            Recommended For You
-          </h2>
-          <button
-            onClick={fetchRecommendedRecipes}
-            className="text-sm text-blue-600 hover:text-blue-800 font-medium flex items-center gap-2"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-            </svg>
-            Refresh
-          </button>
+          <div className="h-6 bg-orange-100 rounded w-56 animate-pulse" />
+          <div className="h-4 bg-orange-100 rounded w-20 animate-pulse" />
         </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {recommendedRecipes.map((recipe) => (
-            <RecipeCard
-              key={`${recipe.id}-${recipe.title}`}
-              id={recipe.id}
-              title={recipe.title}
-              description={recipe.description}
-              created_at={recipe.created_at}
-              user_id={recipe.user_id}
-              onDelete={() => handleDeleteRecipe(recipe.id)}
-              onUpdate={handleUpdateRecipe}
-            />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <SkeletonCard key={i} />
           ))}
         </div>
-      </>
+      </div>
     );
-  };
+  }
+
+  // ── Error state ──
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12 gap-4">
+        <div className="text-4xl">⚠️</div>
+        <p className="text-red-500 font-medium text-center">{error}</p>
+        <button
+          onClick={fetchRecommendedRecipes}
+          className="bg-orange-500 text-white px-5 py-2 rounded-lg hover:bg-orange-600 transition-colors font-semibold shadow"
+        >
+          Try Again
+        </button>
+      </div>
+    );
+  }
+
+  // ── Empty state ──
+  if (recommendedRecipes.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12 gap-3 text-center">
+        <div className="text-5xl">🍽️</div>
+        <p className="text-gray-600 font-semibold text-lg">No recommendations yet</p>
+        <p className="text-gray-400 text-sm max-w-sm">
+          {mode === "user"
+            ? "Favourite and post more recipes to get personalised suggestions!"
+            : "We couldn't find similar recipes right now."}
+        </p>
+      </div>
+    );
+  }
+
+  // ── Results ──
+  const displayTitle =
+    title ??
+    (mode === "similar" ? "Similar Recipes" : "Recommended For You");
+
+  const badge =
+    mode === "similar"
+      ? { emoji: "🔍", label: "Content match" }
+      : { emoji: "✨", label: "Your taste profile" };
 
   return (
-    <div className="recommended-container p-4 md:p-6">
-      {renderContent()}
+    <div>
+      {/* Header */}
+      <div className="flex flex-wrap justify-between items-center mb-6 gap-3">
+        <div className="flex items-center gap-3">
+          <h2 className="text-2xl font-bold text-gray-800">{displayTitle}</h2>
+          <span className="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full bg-orange-100 text-orange-700">
+            {badge.emoji} {badge.label}
+          </span>
+        </div>
+
+        <button
+          onClick={fetchRecommendedRecipes}
+          className="flex items-center gap-1.5 text-sm text-orange-600 hover:text-orange-800 font-semibold transition-colors"
+        >
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+            />
+          </svg>
+          Refresh
+        </button>
+      </div>
+
+      {/* Cards grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+        {recommendedRecipes.map((recipe) => (
+          <RecipeCard
+            key={`rec-${recipe.id}`}
+            id={recipe.id}
+            title={recipe.title}
+            description={recipe.description}
+            created_at={recipe.created_at}
+            user_id={recipe.user_id}
+            onDelete={() => handleDeleteRecipe(recipe.id)}
+            onUpdate={fetchRecommendedRecipes}
+          />
+        ))}
+      </div>
     </div>
   );
 }

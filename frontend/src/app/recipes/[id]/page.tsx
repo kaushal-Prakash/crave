@@ -191,17 +191,17 @@ function RecipeDetailPage() {
           <CommentComponent recipeId={Number(id)} />
         </div>
 
-        {/* Recommended Recipes Section - ADDED HERE */}
+        {/* Recommended Recipes Section */}
         <div className="mb-8">
           <div className="bg-white rounded-xl shadow-2xl p-6 md:p-8 border-2 border-orange-200">
             <h2 className="text-3xl font-bold text-gray-800 mb-6 pb-3 border-b-2 border-orange-200">
               More Recipes You Might Like
             </h2>
-            {currentUserId ? (
-              <Recommended userId={currentUserId} />
-            ) : (
-              <></>
-            )}
+            {/* Pass recipeId for content-based similarity + userId for taste profile fallback */}
+            <Recommended
+              recipeId={Number(id)}
+              userId={currentUserId ?? undefined}
+            />
           </div>
         </div>
       </div>

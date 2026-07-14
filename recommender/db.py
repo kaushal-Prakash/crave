@@ -17,9 +17,13 @@ def load_recipes():
     conn = get_connection()
     cursor = conn.cursor(dictionary=True)
 
-    # Basic recipe info
+    # Basic recipe info with real favorite counts from the favorites table
     cursor.execute("""
-        SELECT id, title, description FROM recipes
+        SELECT r.id, r.title, r.description, r.user_id, r.created_at,
+               COUNT(f.recipe_id) AS favorite_count
+        FROM recipes r
+        LEFT JOIN favorites f ON f.recipe_id = r.id
+        GROUP BY r.id, r.title, r.description, r.user_id, r.created_at
     """)
     recipes = cursor.fetchall()
 
@@ -30,13 +34,25 @@ def load_recipes():
         """, (r["id"],))
         comments = cursor.fetchall()
 
-        # Combine all text into one AI feature blob i.e a single string representing all relevant text data for the recipe
+        # Repeat title 3x to give it stronger weight in TF-IDF
+        weighted_title = (r["title"] + " ") * 3
+
+        # Combine all text into one feature blob
         r["features"] = clean_html(
-            r["title"] + " " +
+            weighted_title +
             r["description"] + " " +
             " ".join([c["content"] for c in comments])
         )
 
+    # Build a lookup: user_id -> list of favorited recipe IDs
+    cursor.execute("SELECT user_id, recipe_id FROM favorites")
+    fav_rows = cursor.fetchall()
+    user_favorites: dict[int, list[int]] = {}
+    for row in fav_rows:
+        uid = row["user_id"]
+        rid = row["recipe_id"]
+        user_favorites.setdefault(uid, []).append(rid)
+
     cursor.close()
     conn.close()
-    return recipes
+    return recipes, user_favorites
