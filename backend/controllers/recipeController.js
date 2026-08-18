@@ -43,7 +43,7 @@ const getRecipeById = async (req, res) => {
 const updateRecipe = async (req, res) => {
   try {
     const { id, title, description } = req.body;
-    if (!id || !title || !description) {
+    if (!id || !title || !description) { // can be written as if(id == null ..)
       return res.status(204).json({ message: "Enter all details" });
     }
 
@@ -104,6 +104,8 @@ const deleteRecipe = async (req, res) => {
 
     // Delete image files from filesystem
     images.forEach(image => {
+      
+      // Use path.join to construct the file path in a cross-platform way
       const filePath = path.join(process.cwd(), "uploads", path.basename(image.image_url));
       if (fs.existsSync(filePath)) {
         fs.unlinkSync(filePath);

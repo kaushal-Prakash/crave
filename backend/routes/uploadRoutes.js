@@ -10,7 +10,10 @@ import {
 const router = express.Router();
 
 router.post("/upload", (req, res) => {
-  upload.single("image")(req, res, function (err) {
+
+  // Use multer middleware to handle the file upload. upload.single("image") is a middleware function that processes the incoming request and extracts the file from the "image" field in the form data. It saves the file to the specified destination and then calls the next middleware (in this case, imgUpload) to handle further processing.
+  
+  upload.single("image")(req, res, function (err) { 
     if (err instanceof multer.MulterError) {
       // A Multer error occurred when uploading
       return res.status(400).json({ message: err.message });

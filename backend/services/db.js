@@ -4,13 +4,14 @@ dotenv.config();
 
 const connectDB = async () => {
   try {
+    // Create a connection pool to the MySQL database using environment variables for configuration. The pool allows multiple connections to be managed efficiently.
     const connection = await mysql.createPool({
       host: process.env.MYSQL_HOST || 'localhost',
       user: process.env.MYSQL_USERNAME,
       password: process.env.MYSQL_PASS,
       database: process.env.MYSQL_DB,
       waitForConnections:true, //if no connections are available, wait in connection queue instead of throwing error
-      connectionLimit:10, //no of connections that can be created at a time by backend
+      connectionLimit:10, //number of connections that can be created at a time by backend
     });
     console.log('😁 MySQL DB connected!');
     return connection;

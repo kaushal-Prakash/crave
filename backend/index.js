@@ -23,7 +23,7 @@ app.use(cors({
   origin: [process.env.FRONTEND, "http://localhost:3000"]
 }));
 app.use(express.json());
-app.use(cookieParser());
+app.use(cookieParser()); // Parse cookies from incoming requests and populate req.cookies with an object keyed by the cookie names.
 app.use(authMiddleware);
 
 // Routes
@@ -43,7 +43,7 @@ app.get("/", (req, res) => {
 
 const port = process.env.PORT || 4000;
 
-const server = http.createServer(app)
+const server = http.createServer(app) // create HTTP server from Express app
 initSocket(server)   // attach realtime engine
 
 //app.listen() secretly creates its own HTTP server
@@ -53,9 +53,9 @@ initSocket(server)   // attach realtime engine
 // Only ONE HTTP server can exist per port.
 // Socket.IO must be attached to that one.
 // app.listen(port, () => {
-//   console.log("🛜 Server running on port:", port);
+//   console.log("Server running on port:", port);
 // });
 
 server.listen(port, () => {
-  console.log("🛜 Server running on port:", port);
+  console.log("Server running on port:", port);
 });

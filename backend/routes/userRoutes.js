@@ -11,8 +11,9 @@ import {
   userSignup,
 } from "../controllers/userController.js";
 
-const router = express.Router();
+const router = express.Router(); // Create a new router instance
 
+// Define routes and associate them with controller functions
 router.post("/user-signup", userSignup);
 router.post("/user-login", userLogin);
 router.post("/add-recipe", addRecipe);

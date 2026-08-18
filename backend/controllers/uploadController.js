@@ -4,14 +4,14 @@ import path from "path";
 import fs from "fs";
 
 // Multer config
-//Multer is a Node.js middleware for handling multipart/form-data, which is the encoding used when uploading files through HTML forms.
+// Multer is a Node.js middleware for handling multipart/form-data, which is the encoding used when uploading files through HTML forms.
 // It works with Express.js and saves uploaded files either:
-// to disk (your local filesystem)
+// to disk (your local filesystem) or to memory (as a Buffer object). You can then process the files as needed, such as saving them to a database or cloud storage.
 
 // Multipart is a way of sending different types of data (like text + files) in a single HTTP request — most commonly used with the content type:  multipart/form-data
 const storage = multer.diskStorage({
   destination: "./uploads",
-  filename: (req, file, cb) => {
+  filename: (req, file, cb) => { // cb is a callback function that you call when you are done processing the file. It takes two arguments: an error (if any) and the filename to save the file as.
     const uniqueName = `${Date.now()}-${file.originalname}`;
     cb(null, uniqueName);
   },
@@ -39,7 +39,7 @@ const imgUpload = async (req, res) => {
 
     if (!recipe_id) {
       // Delete the uploaded file if no recipe_id was provided
-      fs.unlinkSync(path.join(process.cwd(), "uploads", file.filename));
+      fs.unlinkSync(path.join(process.cwd(), "uploads", file.filename)); // synchronously delete the file from the uploads directory as the recipe_id is required to associate the image with a recipe. If used asynchronously, it could lead to race conditions
       return res.status(400).json({ message: "Recipe ID is required" });
     }
 

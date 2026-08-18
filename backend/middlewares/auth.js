@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 
 const authMiddleware = (req, res, next) => {
+  // Define open routes that do not require authentication
   const openRoutes = [
     "/users/user-login",
     "/users/user-signup",

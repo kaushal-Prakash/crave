@@ -4,9 +4,8 @@ import connectDB from "../services/db.js";
 
 const router = express.Router();
 
-/* ----------------------------------------------------
-   RECENT MESSAGES (must be BEFORE :group)
----------------------------------------------------- */
+// RECENT MESSAGES (must be BEFORE :group)
+
 router.get("/recent", authMiddleware, async (req, res) => {
   let connection;
   try {
@@ -19,7 +18,7 @@ router.get("/recent", authMiddleware, async (req, res) => {
        LEFT JOIN users u ON m.user_id = u.id
        WHERE m.group_type = 'veg'
        ORDER BY m.created_at DESC
-       LIMIT 5`
+       LIMIT 5`,
     );
 
     //left join return all rows from messages if matching user exists → add user data if not → return NULL for that message's user data
@@ -29,7 +28,7 @@ router.get("/recent", authMiddleware, async (req, res) => {
        LEFT JOIN users u ON m.user_id = u.id
        WHERE m.group_type = 'non-veg'
        ORDER BY m.created_at DESC
-       LIMIT 5`
+       LIMIT 5`,
     );
 
     res.json({
@@ -48,9 +47,8 @@ router.get("/recent", authMiddleware, async (req, res) => {
   }
 });
 
-/* ----------------------------------------------------
-   GROUP STATS
----------------------------------------------------- */
+// GROUP STATS
+
 router.get("/stats", authMiddleware, async (req, res) => {
   let connection;
   try {
@@ -60,14 +58,14 @@ router.get("/stats", authMiddleware, async (req, res) => {
       `SELECT COUNT(*) AS totalMessages,
               COUNT(DISTINCT user_id) AS onlineUsers
        FROM messages
-       WHERE group_type = 'veg'`
+       WHERE group_type = 'veg'`,
     );
 
     const [nonVeg] = await connection.execute(
       `SELECT COUNT(*) AS totalMessages,
               COUNT(DISTINCT user_id) AS onlineUsers
        FROM messages
-       WHERE group_type = 'non-veg'`
+       WHERE group_type = 'non-veg'`,
     );
 
     res.json({
@@ -88,9 +86,8 @@ router.get("/stats", authMiddleware, async (req, res) => {
   }
 });
 
-/* ----------------------------------------------------
-   GET MESSAGES BY GROUP (PAGINATED)
----------------------------------------------------- */
+// GET MESSAGES BY GROUP (PAGINATED)
+
 router.get("/:group", authMiddleware, async (req, res) => {
   let connection;
   try {
@@ -105,7 +102,7 @@ router.get("/:group", authMiddleware, async (req, res) => {
 
     connection = await connectDB();
 
-    // ❗ LIMIT & OFFSET must be inline (MySQL rule)
+    // LIMIT & OFFSET must be inline (MySQL rule)
     const [messages] = await connection.execute(
       `SELECT m.*, u.fullName, u.username
        FROM messages m
@@ -113,12 +110,12 @@ router.get("/:group", authMiddleware, async (req, res) => {
        WHERE m.group_type = ?
        ORDER BY m.created_at DESC
        LIMIT ${limit} OFFSET ${offset}`,
-      [group]
+      [group],
     );
 
     const [[{ total }]] = await connection.execute(
       `SELECT COUNT(*) AS total FROM messages WHERE group_type = ?`,
-      [group]
+      [group],
     );
 
     res.json({
@@ -138,9 +135,8 @@ router.get("/:group", authMiddleware, async (req, res) => {
   }
 });
 
-/* ----------------------------------------------------
-   SAVE MESSAGE
----------------------------------------------------- */
+// SAVE MESSAGE
+
 router.post("/", authMiddleware, async (req, res) => {
   let connection;
   try {
@@ -154,7 +150,7 @@ router.post("/", authMiddleware, async (req, res) => {
     const [result] = await connection.execute(
       `INSERT INTO messages (user_id, username, group_type, message)
        VALUES (?, ?, ?, ?)`,
-      [userId, username, group, message]
+      [userId, username, group, message],
     );
 
     const [rows] = await connection.execute(
@@ -162,18 +158,16 @@ router.post("/", authMiddleware, async (req, res) => {
        FROM messages m
        LEFT JOIN users u ON m.user_id = u.id
        WHERE m.id = ?`,
-      [result.insertId]
+      [result.insertId],
     );
 
-    res
-      .status(201)
-      .json({
-        success: true,
-        message: rows[0],
-        userId: req.userId,
-        username: req.username,
-        fullName: req.fullName,
-      });
+    res.status(201).json({
+      success: true,
+      message: rows[0],
+      userId: req.userId,
+      username: req.username,
+      fullName: req.fullName,
+    });
   } catch (err) {
     console.error("Save message error:", err);
     res.status(500).json({ success: false });
@@ -182,9 +176,8 @@ router.post("/", authMiddleware, async (req, res) => {
   }
 });
 
-/* ----------------------------------------------------
-   DELETE MESSAGE
----------------------------------------------------- */
+// DELETE MESSAGE
+
 router.delete("/:id", authMiddleware, async (req, res) => {
   let connection;
   try {
@@ -195,7 +188,7 @@ router.delete("/:id", authMiddleware, async (req, res) => {
 
     const [rows] = await connection.execute(
       `SELECT id FROM messages WHERE id = ? AND user_id = ?`,
-      [id, userId]
+      [id, userId],
     );
 
     if (rows.length === 0) {

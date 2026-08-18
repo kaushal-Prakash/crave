@@ -4,7 +4,7 @@ export const createUser = async (fullName, username, email, password) => {
   try {
     const connection = await connectDB();
     const [result] = await connection.execute(
-      "INSERT INTO users (fullName,username, email, password) VALUES (?,?, ?, ?)",
+      "INSERT INTO users (fullName,username, email, password) VALUES (?, ?, ?, ?)",
       [fullName, username, email, password]
     );
     return result.insertId;

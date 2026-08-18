@@ -5,7 +5,8 @@ const createTables = async () => {
   try {
     connection = await connectDB();
 
-    await connection.execute("SET FOREIGN_KEY_CHECKS=0;"); // Disable foreign key checks temporarily
+    // Disable foreign key checks temporarily to avoid issues with table creation order
+    await connection.execute("SET FOREIGN_KEY_CHECKS=0;");
 
     await connection.execute(`
       CREATE TABLE IF NOT EXISTS users (
@@ -17,7 +18,8 @@ const createTables = async () => {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       ) ENGINE=InnoDB;
     `);
-
+    
+    // Use InnoDB engine for foreign key support. If you use MyISAM, foreign keys won't work because MyISAM doesn't support foreign keys. InnoDB is the default storage engine in MySQL 5.5 and later, and it supports transactions and foreign keys.
     await connection.execute(`
       CREATE TABLE IF NOT EXISTS recipes (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -78,7 +80,8 @@ const createTables = async () => {
       ) ENGINE=InnoDB;
     `);
 
-    await connection.execute("SET FOREIGN_KEY_CHECKS=1;"); // Re-enable foreign key checks
+    // Re-enable foreign key checks after table creation
+    await connection.execute("SET FOREIGN_KEY_CHECKS=1;");
 
     console.log("✅ Tables are set up successfully!");
   } catch (error) {

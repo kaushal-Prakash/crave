@@ -6,10 +6,14 @@ import connectDB from "../services/db.js";
 const getUserByUsername = async (username) => {
   try {
     const connection = await connectDB();
+
+    // The '?' is a placeholder for the username parameter, which is passed as an array in the second argument of the execute method. This prevents SQL injection attacks by ensuring that the username is treated as a value rather than part of the SQL command.
     const [rows] = await connection.execute(
       "SELECT * FROM users WHERE username = ?",
       [username]
     );
+
+    // If no user is found, rows will be an empty array. We return the first element of the array (rows[0]) if it exists, or undefined if the array is empty.
     return rows[0];
   } catch (error) {
     console.log("Error getting user via username!");
@@ -25,47 +29,32 @@ const userSignup = async (req, res) => {
   //  bcrypt is based on the Blowfish cipher and uses a salt to protect against rainbow table attacks.
   // bcrypt algorithm = EksBlowfish + Key expansion loops + Salt + Cost factor
   // Step 1: Generate a Salt
-
   // bcrypt first generates a 16-byte random salt (base64-encoded → 22 characters in output).
+
   // Step 2: Key Expansion with EksBlowfish
-
   // bcrypt combines your password + salt to initialize the EksBlowfish key schedule.
-
-  // This process is intentionally computationally expensive — that’s the “work factor” you set (10 in your code).
+  // This process is intentionally computationally expensive — that’s the “work factor” we set (10 in our code).
 
   // Internally:
-
   // Password and salt are repeatedly mixed and expanded through Blowfish’s key setup routine.
-
   // The number of iterations = 2^cost.
-
   // For cost = 10 → 1024 iterations.
-
   // For cost = 12 → 4096 iterations.
-
   // This scaling makes bcrypt future-proof — you can increase cost as CPUs get faster.
 
   // Step 3: Encrypt a Constant String
-
   // After key setup, bcrypt takes a constant input string:
-
   // "OrpheanBeholderScryDoubt"
-
   // It runs this string through the Blowfish encryption function 64 times using the derived key.
-
   // This acts like a final mixing stage that produces a deterministic but one-way result.
 
-  // 🔹 Step 4: Output Formatting
-
+  // Step 4: Output Formatting
   // bcrypt outputs a string containing:
-
   // Algorithm version
-
   // Cost factor
-
   // Salt
-
   // Hashed result
+
   const hashedPassword = await bcrypt.hash(password, 10);
 
   try {
@@ -87,10 +76,12 @@ const userSignup = async (req, res) => {
 
     //but jwt is signed using a secret key (or a public/private key pair), so while anyone can read the payload, they cannot modify it without the secret. If someone tries to change the data, the signature will no longer match, and the server will reject the token as invalid. Its is verified usint fn jwt.verify(token, secret) which checks the signature and also checks if the token is expired or not based on the exp field in payload.
 
+    //this creates a string of userId and username
     const token = jwt.sign({ userId, username }, process.env.JWT_SECRET, {
       expiresIn: "7d",
     });
 
+    // This creates a cookie named "token" that contains the JWT. The cookie is set to be HTTP-only, which means it cannot be accessed via JavaScript (helping to prevent XSS attacks). The cookie is also set to be secure in production, meaning it will only be sent over HTTPS. The maxAge option sets the cookie to expire in 7 days.
     res.cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
