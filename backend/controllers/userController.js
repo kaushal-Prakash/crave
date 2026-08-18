@@ -98,15 +98,52 @@ const userLogin = async (req, res) => {
   try {
     const { username, password } = req.body;
 
+    // Basic validation to ensure user has provided both fields.
     if (!username || !password) {
       return res.status(204).json({ message: "Fill all credentials" });
     }
 
+    // Check whether a user with the given username exists.
     const userExists = await getUserByUsername(username);
     if (!userExists) {
       return res.status(404).json({ message: "username not registered!" });
     }
 
+    // userExists.password contains the bcrypt hash stored in DB.
+    // A bcrypt hash already contains:
+    // 1. bcrypt version
+    // 2. cost factor (work factor)
+    // 3. random salt
+    // 4. final hash
+    //
+    // Example:
+    // $2a$10$abcdefghijklmnopqrstuvXYZ123456...
+    // │   │  │
+    // │   │  └── Salt
+    // │   └───── Cost factor (10)
+    // └───────── Version
+
+    // bcrypt.compare():
+    // 1. Extracts the salt from the stored hash.
+    // 2. Hashes the entered password using that same salt.
+    // 3. Compares the newly generated hash with the stored hash.
+    //
+    // This is why we don't need to manually store or retrieve the salt.
+    const isMatch = await bcrypt.compare(
+      password,
+      userExists.password
+    );
+
+    if (!isMatch) {
+      return res.status(401).json({
+        message: "Invalid credentials",
+      });
+    }
+
+    // Create JWT after successful authentication.
+    // The token is signed, not encrypted.
+    // Anyone can decode the payload, but nobody can modify it
+    // without knowing JWT_SECRET.
     const token = jwt.sign(
       { userId: userExists.id, username },
       process.env.JWT_SECRET,
@@ -115,6 +152,9 @@ const userLogin = async (req, res) => {
       }
     );
 
+    // Store JWT in an HttpOnly cookie.
+    // httpOnly prevents JavaScript access (helps against XSS).
+    // secure ensures cookie is sent only over HTTPS in production.
     res.cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -124,8 +164,20 @@ const userLogin = async (req, res) => {
     return res.status(200).json({ message: "Login successful" });
   } catch (error) {
     console.log("Error in user login : ", error);
+    return res.status(500).json({
+      message: "Internal Server Error",
+    });
   }
 };
+
+//A rainbow table is a precomputed database of common passwords and their corresponding hashes 
+// that attackers use to quickly crack stolen password hashes. Without salting, the same password always
+// produces the same hash, allowing attackers to instantly look up the original password in a rainbow 
+// table. **Salt fixes this by adding a unique random value to each password before hashing, causing
+// the same password to generate a different hash for every user. As a result, precomputed rainbow 
+// tables become ineffective because attackers would need a separate table for every possible 
+// salt value, which is practically impossible to create and store.
+
 
 const getUserById = async (req, res) => {
   try {
