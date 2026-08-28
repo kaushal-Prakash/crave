@@ -42,8 +42,6 @@ router.get("/recent", authMiddleware, async (req, res) => {
   } catch (err) {
     console.error("Recent messages error:", err);
     res.status(500).json({ success: false });
-  } finally {
-    if (connection) await connection.end();
   }
 });
 
@@ -81,8 +79,6 @@ router.get("/stats", authMiddleware, async (req, res) => {
   } catch (err) {
     console.error("Stats error:", err);
     res.status(500).json({ success: false });
-  } finally {
-    if (connection) await connection.end();
   }
 });
 
@@ -130,8 +126,6 @@ router.get("/:group", authMiddleware, async (req, res) => {
   } catch (err) {
     console.error("Fetch messages error:", err);
     res.status(500).json({ success: false, error: err.message });
-  } finally {
-    if (connection) await connection.end();
   }
 });
 
@@ -171,8 +165,6 @@ router.post("/", authMiddleware, async (req, res) => {
   } catch (err) {
     console.error("Save message error:", err);
     res.status(500).json({ success: false });
-  } finally {
-    if (connection) await connection.end();
   }
 });
 
@@ -204,8 +196,6 @@ router.delete("/:id", authMiddleware, async (req, res) => {
   } catch (err) {
     console.error("Delete message error:", err);
     res.status(500).json({ success: false });
-  } finally {
-    if (connection) await connection.end();
   }
 });
 
