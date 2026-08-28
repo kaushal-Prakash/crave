@@ -1,10 +1,9 @@
 import Link from "next/link";
-import React from "react";
 import { FaExclamationTriangle } from "react-icons/fa";
 
 function NotFound() {
   return (
-    <div className="flex flex-col justify-center items-center min-h-screen bg-gradient-to-br from-green-200 to-yellow-200 text-center">
+    <div className="flex flex-col justify-center items-center min-h-screen bg-linear-to-br from-green-200 to-yellow-200 text-center">
       <FaExclamationTriangle className="text-orange-600 text-6xl mb-4 animate-bounce" />
 
       <h1 className="text-5xl font-bold text-gray-800">404</h1>

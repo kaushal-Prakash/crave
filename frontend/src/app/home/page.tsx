@@ -2,7 +2,7 @@
 import RecipeCard from "@/components/RecipeCard";
 import { recipe } from "@/types/types";
 import axios from "axios";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 
 const ITEMS_PER_PAGE = 10;
@@ -71,7 +71,7 @@ function HomePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-200 to-yellow-200 p-8">
+    <div className="min-h-screen bg-linear-to-br from-orange-200 to-yellow-200 p-8">
       <div className="max-w-md mx-auto mb-6 pt-20">
         <input
           type="text"

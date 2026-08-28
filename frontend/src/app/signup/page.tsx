@@ -2,7 +2,7 @@
 /* eslint-disable */
 import axios from "axios";
 import Link from "next/link";
-import React, { useState } from "react";
+import { useState } from "react";
 import { toast } from "react-toastify";
 
 function SignupPage() {
@@ -49,7 +49,7 @@ function SignupPage() {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-green-200 to-yellow-200">
+    <div className="flex justify-center items-center min-h-screen bg-linear-to-br from-green-200 to-yellow-200">
       <div className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-sm">
         <h2 className="text-3xl font-bold text-center text-orange-600 mb-6">Sign Up</h2>
 

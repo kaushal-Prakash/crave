@@ -1,7 +1,7 @@
 "use client";
 /* eslint-disable */
 import React, { useState, useRef, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "next/navigation"; // used for accessing the router object in Next.js for navigation such as navbar links, redirects, and programmatic navigation. 
 import axios from "axios";
 import { toast } from "react-toastify";
 import "quill/dist/quill.snow.css";
@@ -44,8 +44,10 @@ function AddRecipePage() {
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      const selectedFiles = Array.from(e.target.files);
+      const selectedFiles = Array.from(e.target.files); // Convert FileList to an array
+
       // Validate file types and sizes
+      // .filter is used to create a new array containing only the files that meet the specified conditions (image type and size <= 5MB).
       const validFiles = selectedFiles.filter(file => 
         file.type.match('image.*') && file.size <= 5 * 1024 * 1024 // 5MB
       );
@@ -54,6 +56,8 @@ function AddRecipePage() {
         toast.warning("Some files were skipped (only images under 5MB allowed)");
       }
       
+      // Append valid files to the existing images state
+      // we can also u
       setImages(prev => [...prev, ...validFiles]);
     }
   };
@@ -119,9 +123,9 @@ function AddRecipePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-100 to-yellow-100 flex flex-col items-center justify-center p-6">
+    <div className="min-h-screen bg-linear-to-br from-orange-100 to-yellow-100 flex flex-col items-center justify-center p-6">
       <div className="w-full mt-16 max-w-2xl bg-white rounded-xl shadow-2xl p-6 md:p-12 border-2 border-orange-200">
-        <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r bg-clip-text text-transparent from-orange-600 to-yellow-700 mb-8">
+        <h1 className="text-4xl md:text-5xl font-bold bg-linear-to-r bg-clip-text text-transparent from-orange-600 to-yellow-700 mb-8">
           Add a New Recipe
         </h1>
 
@@ -184,7 +188,7 @@ function AddRecipePage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full cursor-pointer bg-gradient-to-r from-green-500 to-green-700 text-white px-6 py-3 rounded-xl hover:from-green-600 hover:to-green-800 transition-all duration-300 font-semibold shadow-lg disabled:opacity-50 disabled:cursor-not-allowed hover:-translate-y-1.5 active:scale-95"
+            className="w-full cursor-pointer bg-linear-to-r from-green-500 to-green-700 text-white px-6 py-3 rounded-xl hover:from-green-600 hover:to-green-800 transition-all duration-300 font-semibold shadow-lg disabled:opacity-50 disabled:cursor-not-allowed hover:-translate-y-1.5 active:scale-95"
           >
             {loading ? (
               <span className="flex items-center justify-center">
