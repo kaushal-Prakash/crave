@@ -6,6 +6,7 @@ from text_cleaner import clean_html
 load_dotenv()
 
 def get_connection():
+    """Establish and return a MySQL database connection using environment credentials."""
     return mysql.connector.connect(
         host=os.getenv("DB_HOST"),
         user=os.getenv("DB_USER"),
@@ -14,10 +15,14 @@ def get_connection():
     )
 
 def load_recipes():
+    """
+    Fetch all recipes, fill them with cleaned text features (title, description, comments),
+    and build a user-to-favorite recipe mapping.
+    """
     conn = get_connection()
-    cursor = conn.cursor(dictionary=True) # cursor is actully a pointer that moves through the tables
+    cursor = conn.cursor(dictionary=True)
 
-    # Basic recipe info with real favorite counts from the favorites table
+    # Fetch recipes along with aggregated favorite counts
     cursor.execute("""
         SELECT r.id, r.title, r.description, r.user_id, r.created_at,
                COUNT(f.recipe_id) AS favorite_count
@@ -28,23 +33,24 @@ def load_recipes():
     recipes = cursor.fetchall()
 
     for r in recipes:
-        # Load comments text
+        # Fetch associated comments to include in the recipe's text corpus
         cursor.execute("""
             SELECT content FROM comments WHERE recipe_id = %s
         """, (r["id"],))
         comments = cursor.fetchall()
 
-        # Repeat title 3x to give it stronger weight in TF-IDF
+        # Weight the title higher for TF-IDF feature extraction
         weighted_title = (r["title"] + " ") * 3
 
-        # Combine all text into one feature blob
+        # Combine and clean text fields into a single feature string
         r["features"] = clean_html(
             weighted_title +
             r["description"] + " " +
             " ".join([c["content"] for c in comments])
         )
 
-    # Build a lookup: user_id -> list of favorited recipe IDs
+    # Build an in-memory user_id -> [recipe_id, ...] lookup for user favorites.
+    # Used in recommender.py to construct each user's taste profile centroid (authored + favorited recipes)
     cursor.execute("SELECT user_id, recipe_id FROM favorites")
     fav_rows = cursor.fetchall()
     user_favorites: dict[int, list[int]] = {}
