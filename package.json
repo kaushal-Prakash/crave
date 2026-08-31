@@ -1,6 +1,6 @@
 {
   "name": "crave",
-  "version": "1.0.0",
+  "version": "1.4.0",
   "description": "Crave is a user-friendly platform designed for food enthusiasts to share and discover new recipes. Users can sign up, upload their favorite dishes, browse community recipes, and engage with others through comments.",
   "main": "index.js",
   "directories": {

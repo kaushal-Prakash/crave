@@ -71,6 +71,15 @@ Crave now brings food enthusiasts together with real-time community chat rooms. 
   - User join/leave notifications
   - Responsive chat interface
 
+### 🤖 RAG Chatbot Assistant (v1.4.0)
+
+- **Crave AI Assistant**
+  - Your personal culinary assistant powered by **Gemini** & **LangChain**
+  - **Retrieval-Augmented Generation (RAG)** using **Chroma Vector Database**
+  - Ask natural language questions like "What can I cook with tomatoes and cheese?"
+  - Intelligent contextual responses based on community recipes
+  - Conversational memory for follow-up questions
+
 ---
 
 ## 🧩 Tech Stack
@@ -99,6 +108,8 @@ Crave now brings food enthusiasts together with real-time community chat rooms. 
 - **TF-IDF NLP Engine**
 - **Cosine Similarity Ranking**
 - **BeautifulSoup** (HTML cleaning)
+- **LangChain** & **ChromaDB** (RAG Chatbot)
+- **Google Generative AI** (Gemini)
 
 ---
 
@@ -204,11 +215,13 @@ A simple and effective automated **CI workflow** (`.github/workflows/ci.yml`) is
 
 ---
 
-## 🤖 AI Recommendation API
+## 🤖 AI & Chatbot API
 
 | Endpoint | Description |
 |----------|-------------|
-| `GET /recommend/:recipeId` | Returns AI-recommended recipes |
+| `GET /recommend-user/:userId` | Returns personalized recipe recommendations |
+| `GET /similar/:recipeId` | Returns recipes similar to a specific recipe |
+| `POST /chat` | RAG-based chat endpoint for recipe questions |
 
 ---
 

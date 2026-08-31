@@ -15,7 +15,7 @@ def get_connection():
 
 def load_recipes():
     conn = get_connection()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor(dictionary=True) # cursor is actully a pointer that moves through the tables
 
     # Basic recipe info with real favorite counts from the favorites table
     cursor.execute("""
