@@ -1,8 +1,22 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from recommender import get_similar_recipes, get_recommendations_for_user, reload_data
+from pydantic import BaseModel
+from typing import List, Dict, Any, Optional
+from chatbot import init_chatbot, get_chat_response
 
-app = FastAPI(title="Crave Recipe Recommender", version="2.0.0")
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup
+    try:
+        init_chatbot()
+    except Exception as e:
+        print(f"Failed to initialize chatbot: {e}")
+    yield
+    # Shutdown (nothing to do)
+
+app = FastAPI(title="Crave Recipe Recommender", version="2.0.0", lifespan=lifespan)
 
 # Allow your frontend
 app.add_middleware(
@@ -16,6 +30,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 # ---------------------------------------------------------------------------
 # Health check
 # ---------------------------------------------------------------------------
@@ -28,6 +43,7 @@ def home():
             "GET /recommend-user/{user_id}",
             "GET /similar/{recipe_id}",
             "POST /reload",
+            "POST /chat",
         ]
     }
 
@@ -76,6 +92,25 @@ def reload():
     """
     try:
         reload_data()
+        init_chatbot(force_rebuild=True)
         return {"status": "ok", "message": "Recipe index reloaded successfully."}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Reload failed: {str(e)}")
+
+# ---------------------------------------------------------------------------
+# AI Chatbot endpoint
+# ---------------------------------------------------------------------------
+class ChatRequest(BaseModel):
+    query: str
+    chat_history: Optional[List[Dict[str, Any]]] = None
+
+@app.post("/chat")
+def chat(req: ChatRequest):
+    """
+    RAG-based chat endpoint to recommend recipes and answer culinary questions.
+    """
+    try:
+        answer = get_chat_response(req.query, req.chat_history)
+        return {"answer": answer}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Chatbot failed: {str(e)}")
