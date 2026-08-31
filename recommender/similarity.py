@@ -13,7 +13,7 @@ def find_similar(vectors, query_vec, recipes, top_k=6, exclude_index=None):
         top_k:         Number of results to return
         exclude_index: Single index or list of indices to skip (e.g. source recipe)
     """
-    scores = cosine_similarity(query_vec, vectors)[0].copy()
+    scores = cosine_similarity(query_vec, vectors)[0].copy() # 0th index is the similarity score
 
     now = datetime.now(timezone.utc)
 
@@ -48,5 +48,5 @@ def find_similar(vectors, query_vec, recipes, top_k=6, exclude_index=None):
     else:
         excluded = {exclude_index}
 
-    ranked = np.argsort(scores)[::-1]
+    ranked = np.argsort(scores)[::-1] # sort in descending order of similarity score and gives indices
     return [i for i in ranked if i not in excluded][:top_k]
