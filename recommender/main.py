@@ -1,7 +1,7 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from recommender import get_similar_recipes, get_recommendations_for_user, reload_data
+from recommender import get_similar_recipes, reload_data
 from pydantic import BaseModel
 from typing import List, Dict, Any, Optional
 from chatbot import init_chatbot, get_chat_response
@@ -40,24 +40,12 @@ def home():
         "message": "Welcome to the Crave Recipe Recommender v2!",
         "server_status": "active",
         "endpoints": [
-            "GET /recommend-user/{user_id}",
             "GET /similar/{recipe_id}",
             "POST /reload",
             "POST /chat",
         ]
     }
 
-# ---------------------------------------------------------------------------
-# User-based recommendations (taste-profile centroid)
-# ---------------------------------------------------------------------------
-@app.get("/recommend-user/{user_id}")
-def recommend_user(user_id: int, top_k: int = 6):
-    """
-    Returns recipes personalised to a user based on their authored
-    and favourited recipes (centroid of all their taste signals).
-    """
-    results = get_recommendations_for_user(user_id, top_k=top_k)
-    return results
 
 # ---------------------------------------------------------------------------
 # Content-based: similar to a specific recipe (for recipe detail pages)

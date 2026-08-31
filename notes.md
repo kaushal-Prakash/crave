@@ -27,7 +27,6 @@ Crave’s AI engine is divided into two distinct, high-performance systems:
                                   │                     MySQL DATABASE                      │
                                   │  - recipes (id, title, description, user_id, date)      │
                                   │  - comments (content, recipe_id)                        │
-                                  │  - favorites (user_id, recipe_id)                       │
                                   └───────────────────────────┬─────────────────────────────┘
                                                               │
                                             load_recipes() in db.py
@@ -90,7 +89,7 @@ def clean_html(text):
 # 3. Module 2: Database Ingestion & Feature Engineering (`db.py`)
 
 ### 🎯 Goal:
-Extract recipes, comments, and user favorites from MySQL, and assemble a single **"Feature Blob"** for every recipe.
+Extract recipes and comments from MySQL, and assemble a single **"Feature Blob"** for every recipe.
 
 ### 🔬 The Secret Trick: Title Weight Multiplication ($3\times$)
 In culinary text, the **title** is usually the most informative signal. A recipe called *"Spicy Paneer Tikka"* is much more clearly defined by its title than by 3 paragraphs of instructions.
@@ -111,20 +110,7 @@ r["features"] = clean_html(
 **Why this works:**
 If the title is *"Butter Chicken"*, the words *"butter"* and *"chicken"* appear at least 3 times more frequently in the document. This artificially boosts their Term Frequency (TF), ensuring the algorithm considers them 3 times more important than casual words in the description.
 
-### 👥 Mapping User Favorites:
-```python
-cursor.execute("SELECT user_id, recipe_id FROM favorites")
-fav_rows = cursor.fetchall()
-user_favorites: dict[int, list[int]] = {}
-for row in fav_rows:
-    uid = row["user_id"]
-    rid = row["recipe_id"]
-    user_favorites.setdefault(uid, []).append(rid)
-```
-- Creates an instant in-memory lookup `{user_id: [recipe_id_1, recipe_id_2, ...]}`.
-- Allows $O(1)$ constant time lookup to see what recipes any user loved.
 
----
 
 # 4. Module 3: The Math of TF-IDF Vectorization (`vectorizer.py`)
 
@@ -222,9 +208,7 @@ scores[i] += recency_bonus
 
 # 6. Module 5: The Recommendation Strategies (`recommender.py`)
 
-Crave provides two distinct recommendation modes:
-
----
+Crave provides a content-based recommendation mode:
 
 ### 📌 Strategy 1: Content-Based Item Similarity (`get_similar_recipes`)
 Used on the **Recipe Details Page** (*"Because you are looking at Recipe X..."*).
@@ -236,44 +220,7 @@ Used on the **Recipe Details Page** (*"Because you are looking at Recipe X..."*)
 5. Over-fetch $3\times$ (`top_k * 3`) to allow filtering out the author's own recipes.
 6. Return the top 6 closest recipes.
 
----
 
-### 👤 Strategy 2: User Taste Centroid (`get_recommendations_for_user`)
-Used on the **Home Feed / Personalized Feed** (*"Recommended for You"*).
-
-```
- User's Authored Recipes        User's Favorited Recipes
-     [Vector 10]                   [Vector 24, Vector 35]
-          │                                  │
-          └────────────────┬─────────────────┘
-                           │
-                           ▼
-              Taste Centroid (Vector Average)
-             [ 0.15, 0.45, 0.00, 0.80, ... ]
-                           │
-                           ▼
-          Cosine Match against Entire Database
-                           │
-                           ▼
-         Personalized Top-6 Recommendations!
-```
-
-#### Step-by-Step Logic:
-1. **Collect Seed Recipes:**
-   - Recipes authored by the user: `authored_ids`.
-   - Recipes favorited by the user: `favourited_ids`.
-   - Combined set: `seed_ids = authored_ids | favourited_ids`.
-2. **Cold-Start Fallback:**
-   - If a new user has 0 authored and 0 favorited recipes, the algorithm automatically falls back to returning the newest community recipes.
-3. **Centroid Math:**
-   - Calculates the average (mean) vector of all seed recipes:
-     $$\vec{C}_{\text{user}} = \frac{1}{M} \sum_{j=1}^{M} \vec{v}_j$$
-   - This dense $\vec{C}_{\text{user}}$ vector represents the user's complete flavor profile (e.g. likes garlic, oregano, and pasta).
-4. **Exclusion & Ranking:**
-   - Excludes recipes the user has *already* interacted with (no point recommending what they already made or liked!).
-   - Ranks all other recipes against $\vec{C}_{\text{user}}$ and returns top 6.
-
----
 
 # 7. Module 6: RAG Chatbot Assistant (`chatbot.py`)
 
@@ -369,9 +316,6 @@ async def lifespan(app: FastAPI):
 
 ### 🌐 Endpoints Summary:
 
-| Endpoint | Method | Purpose |
-|---|---|---|
-| `/recommend-user/{user_id}` | `GET` | Personalized recommendations based on user taste centroid |
 | `/similar/{recipe_id}` | `GET` | Content-based recommendations similar to a specific recipe |
 | `/chat` | `POST` | Natural language culinary assistant powered by RAG |
 | `/reload` | `POST` | Rebuilds TF-IDF matrices & ChromaDB without restarting the server |
@@ -388,7 +332,6 @@ async def lifespan(app: FastAPI):
 | **Cosine Similarity** | Angular distance between vectors | `similarity.py` | Finds twin recipes based on flavor text |
 | **Popularity Dampening** | $1.0 - 0.15 \times \log(1 + \text{favs})$ | `similarity.py` | Prevents viral recipes from clogging recommendations |
 | **Recency Boost** | Up to $+10\%$ bonus for $<30$ days old | `similarity.py` | Surfacing fresh new community creations |
-| **Taste Centroid** | Mean of authored + favorited vectors | `recommender.py` | Creates user taste persona for home feed |
 | **ChromaDB** | Local Vector Database | `chatbot.py` | High-speed semantic similarity retrieval |
 | **Gemini 3.6 Flash** | Large Language Model | `chatbot.py` | Conversational response generation |
 | **Hot Reload** | `POST /reload` | `main.py` | Instant index update after bulk recipe changes |

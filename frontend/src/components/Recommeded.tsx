@@ -6,10 +6,8 @@ import axios from "axios";
 import { toast } from "react-toastify";
 
 interface RecommendedProps {
-  /** Pass to get user-taste-profile recommendations */
-  userId?: number;
-  /** Pass to get "similar to this recipe" recommendations (takes priority) */
-  recipeId?: number;
+  /** Pass to get "similar to this recipe" recommendations */
+  recipeId: number;
   /** Optional title override */
   title?: string;
 }
@@ -33,11 +31,10 @@ function SkeletonCard() {
 }
 
 // ─── Main component ──────────────────────────────────────────────────────────
-function Recommended({ userId, recipeId, title }: RecommendedProps) {
+function Recommended({ recipeId, title }: RecommendedProps) {
   const [recommendedRecipes, setRecommendedRecipes] = useState<recipe[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [mode, setMode] = useState<"similar" | "user" | null>(null);
 
   const fetchRecommendedRecipes = useCallback(async () => {
     setLoading(true);
@@ -45,21 +42,11 @@ function Recommended({ userId, recipeId, title }: RecommendedProps) {
 
     try {
       let response;
-
       if (recipeId) {
-        // Priority 1: content-based similarity to this specific recipe
         response = await axios.get(
           `http://127.0.0.1:8000/similar/${recipeId}`,
           { withCredentials: true, timeout: 10000 }
         );
-        setMode("similar");
-      } else if (userId) {
-        // Priority 2: user taste-profile centroid
-        response = await axios.get(
-          `http://127.0.0.1:8000/recommend-user/${userId}`,
-          { withCredentials: true, timeout: 10000 }
-        );
-        setMode("user");
       } else {
         setLoading(false);
         return;
@@ -86,7 +73,7 @@ function Recommended({ userId, recipeId, title }: RecommendedProps) {
     } finally {
       setLoading(false);
     }
-  }, [recipeId, userId]);
+  }, [recipeId]);
 
   useEffect(() => {
     fetchRecommendedRecipes();
@@ -136,23 +123,16 @@ function Recommended({ userId, recipeId, title }: RecommendedProps) {
         <div className="text-5xl">🍽️</div>
         <p className="text-gray-600 font-semibold text-lg">No recommendations yet</p>
         <p className="text-gray-400 text-sm max-w-sm">
-          {mode === "user"
-            ? "Favourite and post more recipes to get personalised suggestions!"
-            : "We couldn't find similar recipes right now."}
+          We couldn't find similar recipes right now.
         </p>
       </div>
     );
   }
 
   // ── Results ──
-  const displayTitle =
-    title ??
-    (mode === "similar" ? "Similar Recipes" : "Recommended For You");
+  const displayTitle = title ?? "Similar Recipes";
 
-  const badge =
-    mode === "similar"
-      ? { emoji: "🔍", label: "Content match" }
-      : { emoji: "✨", label: "Your taste profile" };
+  const badge = { emoji: "🔍", label: "Content match" };
 
   return (
     <div>

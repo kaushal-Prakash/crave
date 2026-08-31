@@ -30,7 +30,7 @@ def init_chatbot(force_rebuild: bool = False):
     print("Initializing Crave AI Assistant (RAG Chatbot)...")
     
     # 1. Load data
-    recipes, _ = load_recipes()
+    recipes = load_recipes()
     documents = []
     
     for r in recipes:

@@ -219,7 +219,6 @@ A simple and effective automated **CI workflow** (`.github/workflows/ci.yml`) is
 
 | Endpoint | Description |
 |----------|-------------|
-| `GET /recommend-user/:userId` | Returns personalized recipe recommendations |
 | `GET /similar/:recipeId` | Returns recipes similar to a specific recipe |
 | `POST /chat` | RAG-based chat endpoint for recipe questions |
 

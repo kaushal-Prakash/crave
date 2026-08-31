@@ -16,8 +16,7 @@ def get_connection():
 
 def load_recipes():
     """
-    Fetch all recipes, fill them with cleaned text features (title, description, comments),
-    and build a user-to-favorite recipe mapping.
+    Fetch all recipes and fill them with cleaned text features (title, description, comments).
     """
     conn = get_connection()
     cursor = conn.cursor(dictionary=True)
@@ -49,16 +48,6 @@ def load_recipes():
             " ".join([c["content"] for c in comments])
         )
 
-    # Build an in-memory user_id -> [recipe_id, ...] lookup for user favorites.
-    # Used in recommender.py to construct each user's taste profile centroid (authored + favorited recipes)
-    cursor.execute("SELECT user_id, recipe_id FROM favorites")
-    fav_rows = cursor.fetchall()
-    user_favorites: dict[int, list[int]] = {}
-    for row in fav_rows:
-        uid = row["user_id"]
-        rid = row["recipe_id"]
-        user_favorites.setdefault(uid, []).append(rid)
-
     cursor.close()
     conn.close()
-    return recipes, user_favorites
+    return recipes
