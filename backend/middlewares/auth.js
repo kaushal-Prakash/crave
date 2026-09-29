@@ -1,14 +1,14 @@
 import jwt from "jsonwebtoken";
 
 const authMiddleware = (req, res, next) => {
-  // Define open routes that do not require authentication
   const openRoutes = [
     "/users/user-login",
     "/users/user-signup",
     "/",
-    "/users/isLogedIn",
+    "/recipes/get-recipes",
+    "/recipes/get-recipe-by-id",
   ];
-  if (openRoutes.includes(req.path)) {
+  if (openRoutes.includes(req.path) || req.path.startsWith("/images/")) {
     return next();
   }
 
