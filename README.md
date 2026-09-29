@@ -170,6 +170,33 @@ Runs:
 
 ---
 
+## 🧪 Running Tests
+
+Crave includes comprehensive testing across its stack. Here is how to run the test suites:
+
+### End-to-End Tests (TestCafe)
+To run the full E2E browser tests from the root directory:
+```bash
+npm run test
+```
+
+### Backend Tests (Jest)
+To run the unit and integration tests for the Express API:
+```bash
+cd backend
+npm run test
+```
+
+### AI Recommender Tests (Pytest)
+To run the tests for the FastAPI microservice, make sure your virtual environment is active:
+```bash
+cd recommender
+# Activate venv if not already active (Windows: ..\.venv\Scripts\activate)
+pytest
+```
+
+---
+
 ## 🐳 Docker Deployment & CI/CD
 
 The application is fully pre-configured for containerized deployment and automated testing.
