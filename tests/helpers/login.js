@@ -16,7 +16,7 @@ export async function login(t) {
 
     await t.click(passwordInput);
     await t.pressKey("ctrl+a delete");
-    await t.typeText(passwordInput, "123", { paste: true });
+    await t.typeText(passwordInput, "12345678", { paste: true });
 
     await t.click(loginButton).wait(2000);
 

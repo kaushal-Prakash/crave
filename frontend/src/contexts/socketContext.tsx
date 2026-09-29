@@ -36,7 +36,7 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
 
     console.log("🔌 Initializing socket connection...");
     
-    const socket = io(process.env.NEXT_PUBLIC_BACKEND_URL!, {
+    const socket = io(process.env.NEXT_PUBLIC_BACKEND_URL!.replace(/\/$/, ""), {
       withCredentials: true,
       transports: ["websocket", "polling"], // Add polling as fallback
       reconnection: true,

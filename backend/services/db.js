@@ -8,7 +8,7 @@ const connectDB = async () => {
   try {
     if (!pool) {
       pool = mysql.createPool({
-        host: process.env.MYSQL_HOST || 'localhost',
+        host: process.env.MYSQL_HOST || '127.0.0.1',
         user: process.env.MYSQL_USERNAME,
         password: process.env.MYSQL_PASS,
         database: process.env.MYSQL_DB,
