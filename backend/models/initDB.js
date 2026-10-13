@@ -1,8 +1,29 @@
+import mysql from "mysql2/promise";
+import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
 import connectDB from "../services/db.js";
 
-const createTables = async () => {
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+dotenv.config({ path: path.resolve(__dirname, "../.env") });
+dotenv.config();
+
+const ensureDatabaseExists = async () => {
+  const rootConn = await mysql.createConnection({
+    host: process.env.MYSQL_HOST || "127.0.0.1",
+    user: process.env.MYSQL_USERNAME,
+    password: process.env.MYSQL_PASS,
+  });
+  await rootConn.execute(
+    `CREATE DATABASE IF NOT EXISTS \`${process.env.MYSQL_DB || "crave"}\`;`
+  );
+  await rootConn.end();
+};
+
+export const createTables = async () => {
   let connection;
   try {
+    await ensureDatabaseExists();
     connection = await connectDB();
 
     // Disable foreign key checks temporarily to avoid issues with table creation order
@@ -86,9 +107,16 @@ const createTables = async () => {
     console.log("✅ Tables are set up successfully!");
   } catch (error) {
     console.error("❌ Error setting up tables:", error);
-  } finally {
-    if (connection) await connection.end(); // Close connection
+    throw error;
   }
 };
 
-createTables();
+if (process.argv[1] && process.argv[1].endsWith("initDB.js")) {
+  createTables()
+    .then(async () => {
+      const conn = await connectDB();
+      await conn.end();
+      process.exit(0);
+    })
+    .catch(() => process.exit(1));
+}

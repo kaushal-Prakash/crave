@@ -100,7 +100,10 @@ function RecipeCard({
   };
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow-inner hover:shadow-lg transition-all duration-300 ease-in-out max-h-60 flex flex-col justify-between hover:-translate-y-2 relative">
+    <div
+      data-testid="recipe-card"
+      className="bg-white p-4 rounded-lg shadow-inner hover:shadow-lg transition-all duration-300 ease-in-out max-h-60 flex flex-col justify-between hover:-translate-y-2 relative"
+    >
       <div>
         <button
           className="absolute right-3 top-3 cursor-pointer transition-all duration-200 hover:text-orange-600 hover:scale-110 backface-hidden hover:shadow-2xl"

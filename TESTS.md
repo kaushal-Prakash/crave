@@ -2,6 +2,21 @@
 
 This project includes different layers of testing following the testing pyramid approach. Here is how you can run them on your machine:
 
+## 0. Seed Database (Required for E2E Tests)
+Before running automation / E2E tests, feed the required test users, recipes, and favorites into the database:
+```bash
+# From root directory:
+npm run seed
+
+# Or from backend directory:
+cd backend && npm run seed
+```
+This populates:
+- Primary test user `jay` (password: `12345678`)
+- 14 recipes created by `jay` (enables both search and pagination tests)
+- 12 favorite recipes for `jay` (enables favorites and pagination tests)
+- Additional community users, recipes, comments, and chat messages.
+
 ## 1. Backend Tests (Unit and Integration)
 The backend uses **Jest** and **Supertest** to verify individual utility functions (White-box testing) and API endpoints (Black-box testing).
 
@@ -13,11 +28,17 @@ Because the backend uses ES modules, Jest must be run with an experimental flag.
    ```
 2. Run the tests:
    ```bash
-   # If using Command Prompt or bash:
-   set NODE_OPTIONS=--experimental-vm-modules && npx jest
-   
+   # Recommended (Cross-platform across Bash, CMD, and PowerShell):
+   npm test
+
+   # Or if using Git Bash / Linux / macOS terminal:
+   NODE_OPTIONS=--experimental-vm-modules npx jest
+
    # If using PowerShell:
    $env:NODE_OPTIONS="--experimental-vm-modules"; npx jest
+
+   # If using Windows Command Prompt (CMD):
+   set NODE_OPTIONS=--experimental-vm-modules && npx jest
    ```
 
 ## 2. Python Recommender Tests (Unit)

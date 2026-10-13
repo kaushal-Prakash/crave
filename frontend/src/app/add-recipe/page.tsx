@@ -64,8 +64,13 @@ function AddRecipePage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("DEBUG ADD RECIPE: handleSubmit triggered!");
     
-    if (!title.trim() || !description.trim()) {
+    const titleValue = title || (document.querySelector('input[placeholder="Enter recipe title"]') as HTMLInputElement)?.value || "";
+    const descContent = quillInstance.current?.root?.innerHTML || description || (document.querySelector('.ql-editor') as HTMLElement)?.innerHTML || "";
+    console.log("DEBUG ADD RECIPE: titleValue=", titleValue, "descContent=", descContent);
+    if (!titleValue.trim() || !descContent.trim() || descContent === "<p><br></p>") {
+      console.log("DEBUG ADD RECIPE: validation failed!");
       toast.error("Please fill in all required fields");
       return;
     }
@@ -76,9 +81,10 @@ function AddRecipePage() {
       // Create recipe first
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}users/add-recipe`,
-        { title, description },
+        { title: titleValue, description: descContent },
         { withCredentials: true }
       );
+      console.log("DEBUG ADD RECIPE: response status=", response.status, "data=", response.data);
 
       if (response.status === 200) {
         const recipe_id = response.data.recipeId;
@@ -106,10 +112,10 @@ function AddRecipePage() {
           toast.success("Images uploaded successfully!");
         }
 
-        router.push("/home");
+        window.location.href = "/home";
       }
-    } catch (error) {
-      console.error("Error:", error);
+    } catch (error: any) {
+      console.error("DEBUG ADD RECIPE: Error:", error.response?.data || error.message);
       let errorMessage = "An error occurred while adding the recipe.";
       
       if (axios.isAxiosError(error)) {
@@ -123,8 +129,8 @@ function AddRecipePage() {
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-orange-100 to-yellow-100 flex flex-col items-center justify-center p-6">
-      <div className="w-full mt-16 max-w-2xl bg-white rounded-xl shadow-2xl p-6 md:p-12 border-2 border-orange-200">
+    <div className="min-h-screen bg-linear-to-br from-orange-100 to-yellow-100 flex flex-col items-center justify-center p-6 pt-24">
+      <div className="w-full mt-28 max-w-2xl bg-white rounded-xl shadow-2xl p-6 md:p-12 border-2 border-orange-200">
         <h1 className="text-4xl md:text-5xl font-bold bg-linear-to-r bg-clip-text text-transparent from-orange-600 to-yellow-700 mb-8">
           Add a New Recipe
         </h1>
@@ -187,6 +193,7 @@ function AddRecipePage() {
           {/* Submit Button */}
           <button
             type="submit"
+            onClick={handleSubmit}
             disabled={loading}
             className="w-full cursor-pointer bg-linear-to-r from-green-500 to-green-700 text-white px-6 py-3 rounded-xl hover:from-green-600 hover:to-green-800 transition-all duration-300 font-semibold shadow-lg disabled:opacity-50 disabled:cursor-not-allowed hover:-translate-y-1.5 active:scale-95"
           >

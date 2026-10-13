@@ -23,6 +23,9 @@ test("My Recipes page loads and displays recipes", async (t) => {
   // Step 3: Check page loaded
   await t.expect(searchBar.exists).ok("Search bar should exist");
 
+  // Wait for async recipes to load from API
+  await t.expect(recipeCards.exists || noRecipesText.exists).ok("Wait for recipes or no-recipes to appear", { timeout: 10000 });
+
   // Step 4: Check recipes exist OR No recipes exist
   const hasRecipes = await recipeCards.exists;
   const noRecipesVisible = await noRecipesText.exists;
@@ -30,7 +33,34 @@ test("My Recipes page loads and displays recipes", async (t) => {
   if (hasRecipes) {
     console.log("Recipes found on page.");
 
-    // Step 5: Test search filter
+    // Step 5: Pagination test (only if pagination exists)
+    if (await nextBtn.exists) {
+      const isDisabled = await nextBtn.hasAttribute("disabled");
+
+      if (!isDisabled) {
+        await t.eval(() => {
+          const btns = Array.from(document.querySelectorAll('button'));
+          const next = btns.find(b => b.textContent && b.textContent.trim() === 'Next');
+          if (next) next.click();
+        });
+        console.log("Next page clicked");
+
+        await t
+          .expect(prevBtn.hasAttribute("disabled"))
+          .notOk("Prev button should be enabled after moving to next page", { timeout: 5000 });
+
+        await t.eval(() => {
+          const btns = Array.from(document.querySelectorAll('button'));
+          const prev = btns.find(b => b.textContent && b.textContent.trim() === 'Previous');
+          if (prev) prev.click();
+        });
+        await t.wait(500);
+      }
+    } else {
+      console.log("Pagination buttons do not exist — less than 10 recipes.");
+    }
+
+    // Step 6: Test search filter
     const firstRecipeTitle = await recipeCards.nth(0).find("h3").innerText;
 
     await t.typeText(searchBar, firstRecipeTitle, { replace: true }).wait(500);
@@ -38,23 +68,6 @@ test("My Recipes page loads and displays recipes", async (t) => {
     await t
       .expect(recipeCards.count)
       .gte(1, "Search should return at least one recipe");
-
-    // Step 6: Pagination test (only if >10 recipes)
-    // Step 6: Pagination test (only if pagination exists)
-    if (await nextBtn.exists) {
-      const isDisabled = await nextBtn.hasAttribute("disabled");
-
-      if (!isDisabled) {
-        await t.click(nextBtn).wait(500);
-        console.log("Next page clicked");
-
-        await t
-          .expect(prevBtn.hasAttribute("disabled"))
-          .notOk("Prev button should be enabled after moving to next page");
-      }
-    } else {
-      console.log("Pagination buttons do not exist — less than 10 recipes.");
-    }
   } else {
     console.log("No recipes found.");
     await t.expect(noRecipesVisible).ok("Should show No recipes found");

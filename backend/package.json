@@ -4,9 +4,10 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest",
     "dev": "nodemon index.js",
-    "setup": "node models/initDB.js"
+    "setup": "node models/initDB.js",
+    "seed": "node models/seedDB.js"
   },
   "author": "",
   "license": "ISC",
@@ -24,6 +25,10 @@
     "zustand": "^5.0.3"
   },
   "devDependencies": {
+    "@babel/core": "^8.0.7",
+    "@babel/preset-env": "^8.0.7",
+    "babel-jest": "^30.5.2",
+    "cross-env": "^10.1.0",
     "jest": "^30.5.2",
     "nodemon": "^3.1.9",
     "supertest": "^7.2.2"

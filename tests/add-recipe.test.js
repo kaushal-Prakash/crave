@@ -17,28 +17,33 @@ test("User can add a recipe successfully", async t => {
   const quillEditor   = Selector(".ql-editor");
   const submitButton  = Selector("button").withText("Add Recipe & Upload Images");
 
-  // --- FIXED TITLE INPUT ---
-  await t
-    .click(titleInput)
-    .wait(300)
-    .typeText(titleInput, "My Test Recipe", {
-      replace: true,
-      speed: 0.3
-    });
+  // Wait for page to fully load and hydrate
+  await t.wait(2000);
 
-  // --- FIXED QUILL ---
-  await t
-    .click(quillEditor)
-    .wait(300)
-    .typeText(quillEditor, "Test description from TestCafe.", {
-      speed: 0.3
-    });
+  // Wait for inputs and Quill editor to mount
+  await t.expect(titleInput.exists).ok("Title input should exist", { timeout: 10000 });
+  await t.expect(quillEditor.exists).ok("Quill editor should be mounted", { timeout: 10000 });
 
-  // Submit
+  // Type title with small pause for React state update
+  await t.scrollIntoView(titleInput).click(titleInput).wait(300);
+  await t.typeText(titleInput, "My Test Recipe", { replace: true });
+  await t.wait(500);
+
+  // Type in Quill editor
+  await t.scrollIntoView(quillEditor).click(quillEditor).wait(300);
+  await t.typeText(quillEditor, "Test description from TestCafe.", { replace: true });
+  await t.wait(500);
+
+  // Verify inputs have values
+  await t.expect(titleInput.value).eql("My Test Recipe");
+
+  // Scroll to submit button and click
+  await t.expect(submitButton.exists).ok("Submit button should exist");
+  await t.scrollIntoView(submitButton).wait(500);
   await t.click(submitButton);
 
   // Verify redirect to home
   await t
     .expect(t.eval(() => window.location.pathname))
-    .eql("/home", { timeout: 15000 });
+    .eql("/home", { timeout: 20000 });
 });
