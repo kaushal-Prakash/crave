@@ -89,8 +89,18 @@ Because the backend uses ES modules, Jest must be run with an experimental flag.
 ---
 
 ## 2. Python Recommender Tests (Unit)
-The Python recommender uses **Pytest** for testing chatbot logic with mocked external APIs.
+The Python recommender uses **Pytest** with mocked external dependencies (such as Google GenAI / LangChain) to verify conversation pipeline handling and fallback initializations.
 
+### Recommender Test Scenarios
+- **Lazy Chain Initialization (White-Box)**: Ensures `init_chatbot()` is triggered automatically if the RAG chain is uninitialized (`rag_chain is None`).
+- **Conversation History Parsing (White-Box)**: Ensures chat history containing user and AI roles is correctly transformed into LangChain `HumanMessage` and `AIMessage` structures for model context.
+
+### Recommender Test Coverage Matrix
+| Test Suite | File | Category | Technique | Scenarios Covered |
+| :--- | :--- | :--- | :--- | :--- |
+| **Chatbot RAG Chain** | `recommender/tests/test_chatbot.py` | Positive & Unit | White-Box | Uninitialized RAG chain handling, conversion of user & AI dialog turns into LangChain message objects |
+
+### How to Run Python Recommender Tests
 1. Open your terminal from the root project directory and navigate to the recommender:
    ```bash
    cd recommender
@@ -111,11 +121,38 @@ The Python recommender uses **Pytest** for testing chatbot logic with mocked ext
 ---
 
 ## 3. Automation / E2E Tests (TestCafe)
-The end-to-end (E2E) browser automation tests verify UI flows such as logging in with valid and invalid credentials, adding recipes, and favoriting.
+The end-to-end (E2E) browser automation tests use **TestCafe** to drive Google Chrome against the live Next.js frontend, backend API, and database, simulating realistic user journeys.
 
-1. Open your terminal in the **root directory** of the project (`crave`).
-2. Run the npm test script:
+### Positive Testing Scenarios
+- **Valid User Authentication**: Logs in user `jay` with valid password, verifying successful session establishment and redirect to `/home`.
+- **Recipe Creation & Rich Text**: Submits a new recipe with a title and formatted description via Quill editor, verifying database persistence and navigation.
+- **Favorites & Pagination**: Loads user's favorited recipes, tests search input visibility, and verifies next/previous pagination buttons.
+- **User Recipe Management**: Verifies the "My Recipes" dashboard correctly fetches and paginates through recipes created by the logged-in user.
+- **Profile Data Verification**: Verifies that user profile fields (Full Name, Username, Email) correctly populate from backend user data.
+- **Public Page Rendering**: Confirms that unauthenticated public pages (e.g. `/about-us`) render team member cards and headings without requiring a login session.
+
+### Negative Testing Scenarios
+- **Invalid User Credentials**: Submits invalid email and incorrect password on `/login`, verifying the user is denied access and kept on the `/login` page with an error.
+
+### E2E Automation Test Coverage Matrix
+| Test Suite | File | Category | Technique | Scenarios Covered |
+| :--- | :--- | :--- | :--- | :--- |
+| **User Login** | `tests/login.test.js` | Positive & Negative | Black-Box / E2E | Valid login with redirect to `/home`, invalid login with rejection staying on `/login` |
+| **Add Recipe** | `tests/add-recipe.test.js` | Positive | Black-Box / E2E | Form completion, Quill rich-text editor inputs, submit button interaction, redirect to `/home` |
+| **Favorite Recipes** | `tests/fav.test.js` | Positive | Black-Box / E2E | Favorite recipe cards display, search bar presence, pagination button navigation |
+| **My Recipes** | `tests/my-recipes.test.js` | Positive | Black-Box / E2E | User-created recipe grid rendering, pagination across multiple recipe pages |
+| **User Profile** | `tests/profile.test.js` | Positive | Black-Box / E2E | Profile page loading, validation of Full Name, Username, and Email labels and data values |
+| **About Us** | `tests/about-us.test.js` | Positive | Black-Box / E2E | Public layout rendering, verification of team member headings and content blocks |
+
+### How to Run Automation / E2E Tests
+1. Ensure the development server is running in the root directory:
+   ```bash
+   npm run dev
+   ```
+2. Open a separate terminal in the **root directory** of the project (`crave`).
+3. Run the npm test script:
    ```bash
    npm run test
    ```
 *(Note: This command will automatically launch Chrome and execute the test scenarios.)*
+
