@@ -7,3 +7,4 @@ langchain-google-genai
 langchain-chroma
 chromadb
 google-genai
+pytest

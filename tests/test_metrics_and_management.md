@@ -54,7 +54,10 @@ Productivity measures the number of test cases executed or defects found per uni
 ## 4. Testing Techniques Implemented
 
 - **Black-Box Testing:** API endpoints are tested using `supertest` without knowing the internal code logic. Branch and statement coverage are not the primary focus here; we focus on Input -> Output.
-- **White-Box Testing:** Internal utility functions (e.g., token generation) are tested to ensure specific code branches and statements execute correctly.
+- **White-Box Testing:** Internal utility functions (e.g., token verification, controller validation) are tested to ensure specific code branches and statements execute correctly.
+- **Positive & Negative Testing:**
+  - *Positive Testing:* Verifies system behavior with valid data, genuine authentication tokens, open route accessibility, and successful operation completions (HTTP 200).
+  - *Negative Testing:* Tests robustness against missing parameters, invalid/tampered/expired tokens, and boundary errors (HTTP 400, 401, 204).
 - **Unit Testing:** Both frontend/backend functions and Python recommender logic are tested in isolation using Jest and PyTest.
 - **Integration Testing:** Ensuring the database, backend routes, and services interact correctly.
 - **Automation Testing (E2E):** Using TestCafe to simulate real user interactions in the browser (e.g., automated login test).
