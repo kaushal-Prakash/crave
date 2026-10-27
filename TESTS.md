@@ -155,4 +155,3 @@ The end-to-end (E2E) browser automation tests use **TestCafe** to drive Google C
    npm run test
    ```
 *(Note: This command will automatically launch Chrome and execute the test scenarios.)*
-

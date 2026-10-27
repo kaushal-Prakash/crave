@@ -6,17 +6,20 @@ export async function login(t) {
 
     await t.deleteCookies();
 
-    const currentUrl = await t.eval(() => window.location.href);
-    if (!currentUrl.includes("/login")) {
-        await t.navigateTo(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/login`);
-    }
+    // Always navigate freshly to /login so state and inputs from previous tests are reset
+    await t.navigateTo(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/login`);
 
     const usernameInput = Selector('input[placeholder="Enter your email"]');
     const passwordInput = Selector('input[placeholder="Enter your password"]');
     const loginButton   = Selector('button').withText('Login');
 
-    await t.typeText(usernameInput, "jay", { replace: true });
-    await t.typeText(passwordInput, "12345678", { replace: true });
+    await t.expect(usernameInput.exists).ok("Username input should exist", { timeout: 10000 });
+    await t.wait(600); // Allow Next.js client hydration to settle
+
+    await t.click(usernameInput);
+    await t.typeText(usernameInput, "jay", { replace: true, paste: true });
+    await t.click(passwordInput);
+    await t.typeText(passwordInput, "12345678", { replace: true, paste: true });
 
     await t.click(loginButton);
 

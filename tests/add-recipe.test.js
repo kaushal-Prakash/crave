@@ -17,21 +17,19 @@ test("User can add a recipe successfully", async t => {
   const quillEditor   = Selector(".ql-editor");
   const submitButton  = Selector("button").withText("Add Recipe & Upload Images");
 
-  // Wait for page to fully load and hydrate
-  await t.wait(2000);
-
-  // Wait for inputs and Quill editor to mount
+  // Wait for inputs and dynamic Quill editor to mount and hydrate
   await t.expect(titleInput.exists).ok("Title input should exist", { timeout: 10000 });
   await t.expect(quillEditor.exists).ok("Quill editor should be mounted", { timeout: 10000 });
-
-  // Type title with small pause for React state update
-  await t.scrollIntoView(titleInput).click(titleInput).wait(300);
-  await t.typeText(titleInput, "My Test Recipe", { replace: true });
-  await t.wait(500);
+  await t.wait(1000); // Allow React hydration and Quill events to stabilize
 
   // Type in Quill editor
   await t.scrollIntoView(quillEditor).click(quillEditor).wait(300);
-  await t.typeText(quillEditor, "Test description from TestCafe.", { replace: true });
+  await t.typeText(quillEditor, "Test description from TestCafe.", { replace: true, paste: true });
+  await t.wait(500);
+
+  // Type title with small pause for React state update
+  await t.scrollIntoView(titleInput).click(titleInput).wait(300);
+  await t.typeText(titleInput, "My Test Recipe", { replace: true, paste: true });
   await t.wait(500);
 
   // Verify inputs have values
